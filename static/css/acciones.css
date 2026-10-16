@@ -1,0 +1,313 @@
+/* --- ESTILOS GENERALES --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: #0f172a;
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+}
+
+/* --- NAVBAR --- */
+.navbar {
+    background-color: #111827;
+    border-bottom: 1px solid #1f2937;
+    padding: 12px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+.logo-text {
+    color: #60a5fa;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+
+.nav-links a {
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover {
+    color: #60a5fa;
+}
+
+.nav-links a.active {
+    color: #60a5fa;
+    border-bottom: 2px solid #60a5fa;
+    padding-bottom: 4px;
+}
+
+/* --- SECCIÓN DE ACTIVOS CENTRADA Y UNIFORME --- */
+.assets-section {
+    max-width: 1200px;
+    margin: 24px auto 0;
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.assets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 1100px;
+    justify-content: center;
+    justify-items: center;
+}
+
+.asset-btn {
+    background: rgba(31, 41, 55, 0.3);
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    max-width: 105px;
+    height: 75px;
+}
+
+.asset-btn:hover {
+    background: rgba(31, 41, 55, 0.6);
+    border-color: #374151;
+    transform: translateY(-2px);
+}
+
+.asset-btn.active {
+    border-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.1);
+    box-shadow: 0 0 12px rgba(96, 165, 250, 0.15);
+}
+
+.asset-btn img {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 6px;
+    object-fit: contain;
+}
+
+.asset-btn span {
+    font-size: 11px;
+    font-weight: 700;
+    color: #e5e7eb;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+/* --- CONTENEDOR DE GRÁFICA --- */
+.chart-wrapper {
+    max-width: 1200px;
+    margin: 24px auto 0;
+    padding: 0 16px;
+}
+
+.chart-container {
+    background: rgba(31, 41, 55, 0.15);
+    border: 1px solid #1f2937;
+    border-radius: 16px;
+    padding: 20px;
+    height: 200px;
+    position: relative;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.chart-title {
+    color: #34d399;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.chart-subtitle {
+    color: #6b7280;
+    font-size: 10px;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: calc(100% - 40px) !important;
+    cursor: crosshair !important;
+}
+
+/* 🔥 PRECIO FLOTANTE EN ESQUINA */
+.price-corner {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    border-radius: 12px;
+    padding: 12px 20px;
+    text-align: right;
+    min-width: 140px;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.price-corner .label {
+    color: #6b7280;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.price-corner .value {
+    color: #34d399;
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    transition: color 0.3s;
+}
+
+.price-corner .value.negative {
+    color: #ef4444;
+}
+
+.price-corner .change {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.price-corner .change.positive {
+    color: #34d399;
+}
+
+.price-corner .change.negative {
+    color: #ef4444;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .logo-text { font-size: 16px; }
+    .nav-links { gap: 16px; }
+    .nav-links a { font-size: 12px; }
+    .chart-container { height: 350px; padding: 12px; }
+    .asset-btn { padding: 8px 6px; min-width: 55px; height: 65px; max-width: 80px; }
+    .asset-btn img { width: 22px; height: 22px; }
+    .asset-btn span { font-size: 10px; }
+    .price-corner { padding: 8px 14px; min-width: 100px; }
+    .price-corner .value { font-size: 18px; }
+}
+
+@media (max-width: 480px) {
+    .navbar-container { height: 60px; }
+    .logo img { height: 32px; }
+    .nav-links a { font-size: 11px; }
+    .chart-container { height: 280px; }
+    .price-corner { bottom: 10px; right: 10px; padding: 6px 12px; min-width: 80px; }
+    .price-corner .value { font-size: 14px; }
+    .price-corner .label { font-size: 7px; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #374151; }
+
+/* --- DELTA CHART (ocupa todo el ancho) --- */
+.delta-wrapper {
+    max-width: 1200px;
+    margin: 24px auto 0;
+    padding: 0 16px;
+}
+.delta-container {
+    background: rgba(31, 41, 55, 0.15);
+    border: 1px solid #1f2937;
+    border-radius: 16px;
+    padding: 16px;
+    height: 450px;
+    position: relative;
+}
+.delta-container canvas {
+    width: 100% !important;
+    height: calc(100% - 70px) !important;
+}
+.delta-buttons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.delta-btn {
+    background: #1a1a3e;
+    color: #888;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 2px 12px;
+    font-size: 8px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    transition: all 0.2s;
+}
+.delta-btn:hover { background: #2a2a4e; color: #fff; }
+.delta-btn.active { background: #ff6b35; color: #fff; border-color: #ff6b35; }
+.delta-scrollbar {
+    width: 100%;
+    margin-top: 8px;
+    accent-color: #ff6b35;
+    background: #1a1a3e;
+    height: 4px;
+    border-radius: 2px;
+}
+.delta-scrollbar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff6b35;
+    cursor: pointer;
+}

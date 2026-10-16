@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Análisis Pro - BVC SaaS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="../static/css/acciones.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- NAVBAR -->
+    <!-- ========================================== -->
+    
+    <nav class="navbar">
+  <div style="max-width: 1400px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;">
+    <a href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+      <span style="color: #fff; font-weight: 700; font-size: 16px;">📈 Trading Venezuela</span>
+    </a>
+    <div style="display: flex; gap: 20px;">
+      <a href="../index.html" style="color: #93c5fd; font-size: 12px; text-decoration: none;">Inicio</a>
+      <a href="index.html" style="color: #6b7280; font-size: 12px; text-decoration: none;">grafica</a>
+    </div>
+  </div>
+</nav>
+
+    <!-- ========================================== -->
+    <!-- SELECCIONAR ACTIVO -->
+    <!-- ========================================== -->
+     <section class="assets-section">
+        <!-- --- Gigantes Tecnológicas, Streaming y Consumo --- -->
+        <div class="assets-grid">
+            <button class="asset-btn active" data-symbol="ABC.A">
+                <img src="../static/img/caribe.png" alt="ABC.A" />
+                <span>ABC.A</span>
+            </button>
+            <button class="asset-btn" data-symbol="BPV">
+               <img src="../static/img/provincial.png" alt="BPV" />
+               <span>BPV</span>
+            </button>
+            <button class="asset-btn" data-symbol="BNC">
+              <img src="../static/img/BNC.png" alt="BNC" />
+              <span>BNC</span>
+            </button>
+             <button class="asset-btn" data-symbol="BVCC">
+              <img src="../static/img/bdvc.png" alt="BVCC" />
+              <span>BVCC</span>
+            </button>
+            <button class="asset-btn" data-symbol="BVL">
+              <img src="../static/img/bdv.png" alt="BVL" />
+              <span>BVL</span>
+            </button>
+            <button class="asset-btn" data-symbol="CCP_B">
+              <img src="../static/img/perCapital.png" alt="CCP_B" />
+              <span>ccp_b</span>
+            </button>
+            <button class="asset-btn" data-symbol="CCR">
+              <img src="../static/img/ceramica.png" alt="CCR" />
+              <span>CCR</span>
+            </button>
+            <button class="asset-btn" data-symbol="CGQ">
+              <img src="../static/img/grupo quimico.png" alt="CGQ" />
+              <span>CGQ</span>
+            </button>
+            <button class="asset-btn" data-symbol="CRM.A">
+              <img src="../static/img/corimon.png" alt="CRM.A" />
+              <span>CRM.A</span>
+            </button>
+            <button class="asset-btn" data-symbol="DOM">
+              <img src="../static/img/DOM.png" alt="DOM" />
+              <span>DOM</span>
+            </button>
+            <button class="asset-btn" data-symbol="EFE">
+              <img src="../static/img/efe.png" alt="EFE" />
+              <span>EFE</span>
+            </button>
+            <button class="asset-btn" data-symbol="RST">
+              <img src="../static/img/santaTeresa.png" alt="RST" />
+              <span>RST</span>
+            </button>
+            <button class="asset-btn" data-symbol="ENV">
+              <img src="../static/img/envases.png" alt="ENV" />
+              <span>ENV</span>
+            </button>
+            <button class="asset-btn" data-symbol="FNC">
+              <img src="../static/img/cemento.png" alt="FNC" />
+              <span>FNC</span>
+            </button>
+            <button class="asset-btn" data-symbol="FNV">
+              <img src="../static/img/FNV.png" alt="FNV" />
+              <span>FNV</span>
+            </button>
+            <button class="asset-btn" data-symbol="FNV">
+              <img src="../static/img/FNV.png" alt="FNV" />
+              <span>FNV</span>
+            </button>
+            <button class="asset-btn" data-symbol="GMC.B">
+              <img src="../static/img/mantra.png" alt="GMC.B" />
+              <span>GMC_B</span>
+            </button>
+            <button class="asset-btn" data-symbol="GZL">
+              <img src="../static/img/grupo zuleano.png" alt="GZL" />
+              <span>GZL</span>
+            </button>
+            <button class="asset-btn" data-symbol="MPA">
+              <img src="../static/img/Manpa.png" alt="MPA" />
+              <span>MPA</span>
+            </button>
+            <button class="asset-btn" data-symbol="MVZ.A">
+              <img src="../static/img/mercantil.png" alt="MVZ_A" />
+              <span>MVZ_A</span>
+            </button>
+            <button class="asset-btn" data-symbol="MVZ.B">
+              <img src="../static/img/mercantil.png" alt="MVZ_B" />
+              <span>MVZ_B</span>
+            </button>
+             <button class="asset-btn" data-symbol="PGR">
+              <img src="../static/img/proagro.jpg" alt="PGR" />
+              <span>PGR</span>
+            </button>
+            <button class="asset-btn" data-symbol="PTN">
+              <img src="../static/img/protinal.svg" alt="PTN" />
+              <span>PTN</span>
+            </button>
+            <button class="asset-btn" data-symbol="SVS">
+              <img src="../static/img/sinvesa.png" alt="SVS" />
+              <span>SVS</span>
+            </button>
+            <button class="asset-btn" data-symbol="TPG">
+              <img src="../static/img/telares.jpg" alt="TPG" />
+              <span>TPG</span>
+            </button>
+            <button class="asset-btn" data-symbol="TDV.D">
+              <img src="../static/img/cantv.png" alt="TDV.D" />
+              <span>TDV.D</span>
+            </button>
+            
+            
+            </div>
+        
+    </section>
+
+    <!-- ========================================== -->
+    <!-- GRÁFICA CON PRECIO EN ESQUINA -->
+    <!-- ========================================== -->
+<section class="chart-wrapper">
+    <div class="chart-container">
+
+        <!-- HEADER -->
+        <div class="chart-header">
+            <span class="chart-title" id="chart-title">📊 RESUMEN</span>
+            <span class="chart-subtitle" id="chart-subtitle">Actualizado: --</span>
+        </div>
+
+        <!-- 4 TARJETAS DE INFO -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 12px 16px;">
+            <div style="background: rgba(96,165,250,0.05); border: 1px solid rgba(96,165,250,0.15); border-radius: 8px; padding: 10px;">
+                <div style="color: #6b7280; font-size: 9px; letter-spacing: 0.5px; margin-bottom: 4px;">SÍMBOLO</div>
+                <div id="info-simbolo" style="color: #fff; font-size: 14px; font-weight: bold;">--</div>
+            </div>
+            <div style="background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.15); border-radius: 8px; padding: 10px;">
+                <div style="color: #6b7280; font-size: 9px; letter-spacing: 0.5px; margin-bottom: 4px;">PRECIO</div>
+                <div id="info-precio" style="color: #ffd700; font-size: 14px; font-weight: bold;">--</div>
+            </div>
+            <div style="background: rgba(255,170,0,0.05); border: 1px solid rgba(255,170,0,0.15); border-radius: 8px; padding: 10px;">
+                <div style="color: #6b7280; font-size: 9px; letter-spacing: 0.5px; margin-bottom: 4px;">VARIACIÓN</div>
+                <div id="info-var" style="color: #ffaa00; font-size: 14px; font-weight: bold;">--</div>
+            </div>
+            <div style="background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.15); border-radius: 8px; padding: 10px;">
+                <div style="color: #6b7280; font-size: 9px; letter-spacing: 0.5px; margin-bottom: 4px;">CAPITALIZACIÓN</div>
+                <div id="info-capitali" style="color: #93c5fd; font-size: 12px; font-weight: bold; line-height: 1.4;">--</div>
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- ========================================== -->
+<!--libro de orednes-->
+<!-- ========================================== -->
+<div style="display: flex; justify-content: center; align-items: center; width: 100%; margin-top: 20px;">
+    <div style="background: linear-gradient(145deg, #0a0a1a, #060612); border: 1px solid #1a1a3e; border-radius: 12px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); font-family: 'Courier New', monospace; width: 75%; ">
+        
+        <!-- Cabecera con 3 columnas -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 0 10px 6px 10px; border-bottom: 1px solid #1f1f40; font-size: 12px; font-weight: bold; color: #6b7280;">
+            <span style="text-align: left;">CANTIDAD</span>
+            <span style="text-align: center;">VALOR (Bs.)</span>
+            <span style="text-align: right;">OFERTA (PRICE ↓)</span>
+        </div>
+
+        <!-- ASKS (Ventas) -> 6 filas exactas -->
+        <div id="tabla-asks" style="display: flex; flex-direction: column; gap: 3px; margin-top: 6px; height: 170px; overflow: hidden;"></div>
+
+        <!-- Separador Central con Medidor de Dominancia -->
+        <div style="padding: 10px 4px; display: flex; flex-direction: column; gap: 6px; text-align: center; border-top: 1px solid #1f1f40; border-bottom: 1px solid #1f1f40; margin: 6px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #6b7280;">
+                <span id="dominancia-label" style="transition: color 0.3s;">--- DOMINIO / PRECIO ---</span>
+                <span id="dominancia-porcentaje" style="color: #9ca3af; font-size: 11px;">50%</span>
+            </div>
+            <div style="width: 100%; height: 5px; background: #1f1f40; border-radius: 3px; overflow: hidden; display: flex;">
+                <div id="barra-ventas" style="height: 100%; width: 50%; background: #ef4444; transition: width 0.4s ease, background 0.4s ease;"></div>
+                <div id="barra-compras" style="height: 100%; width: 50%; background: #34d399; transition: width 0.4s ease, background 0.4s ease;"></div>
+            </div>
+        </div>
+
+        <!-- BIDS (Compras) -> 6 filas exactas -->
+        <div id="tabla-bids" style="display: flex; flex-direction: column; gap: 3px; height: 170px; overflow: hidden;"></div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- DELTA CVD (ocupa todo el ancho) -->
+<!-- ========================================== -->
+<div class="delta-wrapper">
+    <div class="delta-container">
+        <div class="chart-header">
+            <span style="color: #60a5fa; font-size: 11px; font-weight: bold; font-family: 'Courier New', monospace; letter-spacing: 1px;">📊 DELTA - COMPRAS vs VENTAS</span>
+            <span style="color: #555; font-size: 8px; font-family: 'Courier New', monospace;">Arrastra scroll para ver historial</span>
+        </div>
+        <div id="power-status" style="text-align: center;font-size: 10px;font-family: 'Courier New', monospace;font-weight: bold;margin: 5px 0;padding: 5px;background: rgba(255,255,255,0.03);border-radius: 4px;letter-spacing: 0.5px;">
+          ANALIZANDO FLUJO...
+        </div>
+
+
+        <canvas id="deltaChart"></canvas>
+        <!--<input type="range" id="chartScrollbar">-->
+    </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- VELA DELTA (precio + burbujas de volumen) -->
+<!-- ========================================== -->
+<div style="max-width: 1200px; margin: 24px auto; padding: 0 16px;">
+    <div style="background: #0a0a1a; padding: 16px; border-radius: 16px; border: 1px solid #1a1a3e;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="color: #f87171; font-size: 13px; font-weight: bold; font-family: 'Courier New', monospace; letter-spacing: 1px;">📈 VELA DELTA · BNC</span>
+            <span style="color: #555; font-size: 9px; font-family: 'Courier New', monospace;">Línea: Precio · Burbuja: Volumen · Color: Delta</span>
+        </div>
+        <div style="height: 400px; position: relative;">
+            <canvas id="velaDeltaChart"></canvas>
+        </div>
+    </div>
+</div> 
+<!-- ========================================== -->
+<!-- DELTA BOOK - VENTAS | DOMINANCIA | COMPRAS -->
+<!-- ========================================== -->
+<div style="max-width: 1200px; margin: 24px auto 0; padding: 0 16px;">
+    <div style="background: #0a0a1a; border-radius: 16px; border: 1px solid #1a1a3e; overflow: hidden;">
+
+        <!-- HEADER -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #1a1a3e;">
+            <span style="color: #f87171; font-size: 13px; font-weight: bold; font-family: 'Courier New', monospace; letter-spacing: 1px;">📊 DELTA BOOK</span>
+            <span id="precio-actual-delta" style="color: #ffd700; font-size: 13px; font-family: 'Courier New', monospace; font-weight: bold;">💰 $0.00</span>
+        </div>
+
+        <!-- VENTAS (Arriba) -->
+        <div style="background: rgba(239, 68, 68, 0.05); padding: 12px 16px;">
+            <!-- CABECERA VENTAS -->
+            <div style="display: grid; grid-template-columns: 70px 80px 65px 65px 90px 80px 1fr; gap: 4px; font-size: 9px; font-weight: 700; color: #ff6b6b; padding: 0 4px 6px 4px; border-bottom: 1px solid rgba(255,107,107,0.15); letter-spacing: 0.3px;">
+                <span>HORA</span>
+                <span>PRECIO</span>
+                <span>ASK</span>
+                <span>BID</span>
+                <span>VOLUMEN</span>
+                <span>BS</span>
+                <span style="text-align: right;">DELTA</span>
+            </div>
+            <!-- CONTENEDOR VENTAS -->
+            <div id="delta-asks" style="max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding-right: 4px;">
+                <!-- JS llena esto -->
+            </div>
+        </div>
+
+        <!-- DOMINANCIA -->
+        <div style="background: #0f172a; padding: 14px 20px; border-top: 1px solid #1f2937; border-bottom: 1px solid #1f2937;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="color: #00ff88; font-size: 10px; font-weight: bold;">🟢 COMPRADORES</span>
+                <span style="color: #ffaa00; font-size: 11px; font-weight: bold; font-family: 'Courier New', monospace;" id="dominancia-porcentaje-delta">50% / 50%</span>
+                <span style="color: #ff6b6b; font-size: 10px; font-weight: bold;">🔴 VENDEDORES</span>
+            </div>
+            <div style="position: relative; width: 100%; height: 24px; background: #1a1a2e; border-radius: 12px; overflow: hidden;">
+                <div id="dominance-fill-delta" style="width: 50%; height: 100%; background: linear-gradient(90deg, #00ff88, #ffaa00, #ff6b6b); border-radius: 12px; transition: width 0.5s ease;"></div>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 10px; font-weight: bold; text-shadow: 0 0 10px rgba(0,0,0,0.9);">
+                    ⚖️ <span id="dominancia-texto-delta">50% / 50%</span>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                <span style="color: #00ff88; font-size: 8px;">0% COMPRA</span>
+                <span style="color: #ffaa00; font-size: 8px;">⚖️ EQUILIBRIO</span>
+                <span style="color: #ff6b6b; font-size: 8px;">100% VENTA</span>
+            </div>
+            <div id="market-sentiment-delta" style="text-align: center; color: #ffaa00; font-size: 11px; font-weight: bold; margin-top: 6px;">MERCADO EQUILIBRADO</div>
+        </div>
+
+        <!-- COMPRAS (Abajo) -->
+        <div style="background: rgba(0, 255, 136, 0.05); padding: 12px 16px;">
+            <!-- CABECERA COMPRAS -->
+            <div style="display: grid; grid-template-columns: 70px 80px 65px 65px 90px 80px 1fr; gap: 4px; font-size: 9px; font-weight: 700; color: #00ff88; padding: 0 4px 6px 4px; border-bottom: 1px solid rgba(0,255,136,0.15); letter-spacing: 0.3px;">
+                <span>HORA</span>
+                <span>PRECIO</span>
+                <span>ASK</span>
+                <span>BID</span>
+                <span>VOLUMEN</span>
+                <span>BS</span>
+                <span style="text-align: right;">DELTA</span>
+            </div>
+            <!-- CONTENEDOR COMPRAS -->
+            <div id="delta-bids" style="max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding-right: 4px;">
+                <!-- JS llena esto -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+<script src="../static/js/acciones/app.js"></script>
+<script src="../static/js/acciones/book.js"></script>
+<script src="../static/js/acciones/CVD.js"></script>
+<script src="../static/js/acciones/resumen.js"></script>
+
+<script src="../static/js/acciones/vela.js"></script>
+<script src="../static/js/acciones/delta_book.js"></script>
+ <!--
+
+<script src="../static/js/acciones/profundidad.js"></script>
+
+
+
+-->
+
+
+</body>
+</html>

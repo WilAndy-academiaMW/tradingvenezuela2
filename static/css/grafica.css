@@ -1,0 +1,57 @@
+/* El contenedor general del panel */
+.panel.chart-container {
+    display: flex;
+    flex-direction: column;
+    background-color: #161a22 !important; /* Gris oscuro de fondo */
+    padding: 15px !important;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* EL ÁREA REAL DEL GRÁFICO (El div #chart) */
+.chart-area#chart {
+    flex-grow: 1;
+    width: 100% !important;
+    height: 600px !important; /* Mantenemos tus 600px fijos pero en CSS normal */
+    background-color: #0b0e11 !important; /* Negro profundo para las velas */
+    border: 1px solid #2b3139 !important; /* Borde sutil */
+    border-radius: 8px;
+    overflow: hidden; /* Evita que las barras del gráfico se salgan de la caja */
+    position: relative;
+}
+/* toggle donde aparece el volumen,delta,mapa de ordenes*/
+
+    @keyframes pulse {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(0.8); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    #termometroLiquidezContainer {
+        display: none; background: #0a0a1a; border-radius: 10px; margin: 10px; padding: 5px; max-height: 700px; overflow: hidden;
+    }
+    #termometroLiquidezContainer > div > div { scrollbar-width: thin; scrollbar-color: #00ff88 #1a1a2e; }
+    #termometroLiquidezContainer > div > div::-webkit-scrollbar { width: 4px; }
+    #termometroLiquidezContainer > div > div::-webkit-scrollbar-track { background: #1a1a2e; }
+    #termometroLiquidezContainer > div > div::-webkit-scrollbar-thumb { background: #00ff88; border-radius: 2px; }
+
+
+
+
+    .tf-btn {
+    padding: 8px 15px;
+    border: 1px solid #444;
+    background-color: #333; /* Color base oscuro */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Este es el estilo para el botón activo */
+.tf-btn.active {
+    background-color: #FF0000 !important; /* Rojo intenso */
+    color: white !important;
+    border: 1px solid #FF0000;
+    font-weight: bold;
+    /* Un pequeño brillo o sombra para que resalte más */
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}

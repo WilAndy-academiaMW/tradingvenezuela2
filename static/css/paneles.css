@@ -1,0 +1,51 @@
+/* Asegura que el dashboard ocupe toda la pantalla */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.dashboard {
+    display: flex; /* Activa el diseño en columnas */
+    flex-direction: row;
+    height: 100vh; /* Ocupa el 100% de la altura de la pantalla */
+    width: 100vw;  /* Ocupa el 100% del ancho */
+    overflow: hidden;
+}
+
+/* Panel de Acciones (Watchlist) */
+/* Panel de Acciones (Watchlist) */
+.watchlist {
+    position: relative;
+    width: 250px; /* Ancho inicial */
+    min-width: 200px;
+    max-width: 450px;
+    background-color: #181a20;
+    flex-shrink: 0; /* Evita que el panel se encoja solo */
+    
+    /* Añade estas propiedades para el scroll */
+    overflow-y: auto; /* Permite hacer scroll vertical */
+    scrollbar-width: none; /* Oculta el scroll en Firefox */
+}
+
+/* Oculta el scroll en Chrome, Safari y Edge */
+.watchlist::-webkit-scrollbar {
+    display: none;
+}
+
+/* Panel de la Gráfica */
+.chart-container {
+    flex-grow: 1; /* Esto hace que ocupe TODO el espacio sobrante */
+    display: flex;
+    flex-direction: column;
+    background-color: #161a20;
+    overflow: hidden; /* Importante para que la gráfica no desborde */
+}
+
+/* Opcional: Para que el área interna del gráfico se ajuste */
+.chart-area {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}

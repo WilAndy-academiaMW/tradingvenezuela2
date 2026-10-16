@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>acciones americanas</title>
+    
+    <link rel="stylesheet" href="../static/css/index.css">
+    <STYle>
+        .panel.watchlist {
+    max-height: 800px;          /* ajusta la altura a tu gusto */
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;      /* Firefox: oculta scrollbar */
+    -ms-overflow-style: none;   /* IE/Edge: oculta scrollbar */
+}
+
+.panel.watchlist::-webkit-scrollbar {
+    display: none;              /* Chrome/Safari/Opera: oculta scrollbar */
+}
+    </STYle>
+   
+    <link rel="stylesheet" href="../static/css/header.css">
+    <link rel="stylesheet" href="../static/css/paneles.css">
+    <link rel="stylesheet" href="../static/css/grafica.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    
+</head>
+<body>
+    
+    <nav class="navbar">
+  <div style="max-width: 1400px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;">
+    <a href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+      <span style="color: #fff; font-weight: 700; font-size: 16px;">📈 Trading Venezuela</span>
+    </a>
+    <div style="display: flex; gap: 20px;">
+      <a href="../index.html" style="color: #93c5fd; font-size: 12px; text-decoration: none;">Inicio</a>
+      <a href="index2.html" style="color: #6b7280; font-size: 12px; text-decoration: none;">Acciones</a>
+    </div>
+  </div>
+</nav>
+
+<!--header-->
+<header class="app-header">
+    <!-- Lado Izquierdo: Branding de la App -->
+    <div class="brand-title">
+        THE PRINCE
+    </div>
+<div class="tf-container">
+    <button id="btn-moneda-toggle" onclick="toggleMonedaVisual()" class="tf-btn" title="Cambiar entre Bs y EUR">
+        BS
+    </button>
+
+    <button onclick="cambiarTF('1d', this)" class="tf-btn">1D</button>
+    <button onclick="cambiarTF('1w', this)" class="tf-btn">1W</button>
+    <button onclick="cambiarTF('1M', this)" class="tf-btn">1M</button>
+</div>
+    <!-- Centro: El nuevo menú de herramientas analíticas (Dropdowns) -->
+    <div class="toolbar-dropdowns no-scrollbar">
+
+        <div class="dropdown">
+            <button type="button" class="dropdown-trigger btn-smc">
+                <span>⚡</span> SMC <small class="arrow">▼</small>
+            </button>
+            <div class="dropdown-content">
+                <div onclick="toggleEstructura()" class="dropdown-item"><span>📉</span> BOS / CHoCH</div>
+                <div onclick="toggleFVG()" class="dropdown-item"><span>⚡</span> FVG</div>
+                <div onclick="toggleOrdenblock()" class="dropdown-item"><span>📥</span> S&D ZONES</div>
+                <div onclick="toggleLiquidez()" class="dropdown-item"><span>🎯</span> Liquidez</div>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button type="button" class="dropdown-trigger btn-smc">
+                <span>⚡</span> zonas piso/techo <small class="arrow">▼</small>
+            </button>
+            <div class="dropdown-content">
+                <div onclick="toggleZonasPivotes()" class="dropdown-item"><span>🎯</span> pivotes explosivos</div>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button type="button" class="dropdown-trigger btn-vol">
+                <span>📊</span> VOLUMEN <small class="arrow">▼</small>
+            </button>
+            <div class="dropdown-content">
+                <div id="btn-vpvr" onclick="window.toggleVPVR()" class="dropdown-item">
+                   <span>📊</span> VPVR
+                </div>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button type="button" class="dropdown-trigger btn-osc">
+                <span>🌊</span> OSCILADORES <small class="arrow">▼</small>
+            </button>
+            <div class="dropdown-content">
+                <div onclick="toggleRSI()" class="dropdown-item"><span>🟣</span> RSI</div>
+                <div onclick="toggleMCDE()" class="dropdown-item"><span>📊</span> MACD</div>
+                <div onclick="toggleBB()" class="dropdown-item"><span>🔵</span> Bollinger</div>
+                <div onclick="toggleEMA()" class="dropdown-item"><span>📈</span> Medias Móviles</div>
+                <div onclick="toggleADX()" class="dropdown-item"><span>📡</span> ADX</div>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button type="button" class="dropdown-trigger btn-draw">
+                <span>🛠️</span> DIBUJO <small class="arrow">▼</small>
+            </button>
+            <div class="dropdown-content">
+                <div onclick="window.activarModoLinea()" class="dropdown-item"><span>📐</span> Línea de Tendencia</div>
+                <div onclick="window.activarModoHorizontal()" class="dropdown-item"><span>➖</span> Línea Horizontal</div>
+                <div onclick="window.activarModoRectangulo()" class="dropdown-item"><span>🟦</span> Rectángulo</div>
+                <div onclick="toggleFiboTool()" class="dropdown-item"><span>📉</span> Fibonacci</div>
+                <div onclick="toggleReglaTool()" class="dropdown-item"><span>📏</span> Regla</div>
+                <div onclick="window.activarModoRiesgo()" class="dropdown-item"><span>🎯</span> Posición Largo/Corto (RR)</div>
+                <div onclick="window.activarModoElliot()" class="dropdown-item"><span>🌊</span> Ondas de Elliot %</div>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button type="button" class="dropdown-trigger btn-clean">
+                <span>🗑️</span> LIMPIAR <small class="arrow">▼</small>
+            </button>
+            <div class="dropdown-content">
+                <div onclick="limpiarLineas()" class="dropdown-item"><span>📏</span> Líneas</div>
+                <div onclick="limpiarCuadrados()" class="dropdown-item"><span>🟦</span> Cuadrados</div>
+                <div onclick="limpiarFibo()" class="dropdown-item"><span>📉</span> Fibonacci</div>
+                <div onclick="limpiarRegla()" class="dropdown-item"><span>📐</span> Regla</div>
+                <div onclick="limpiarTodo()" class="dropdown-item item-danger"><span>🔥</span> Borrar Todo</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lado Derecho: Selectores de Timeframes -->
+    <div class="tf-container">
+        
+        <button onclick="cambiarTF('1d', this)" class="tf-btn">1D</button>
+        <button onclick="cambiarTF('1w', this)" class="tf-btn">1W</button>
+         <button onclick="cambiarTF('1M', this)" class="tf-btn">1M</button>
+    </div>
+</header>
+
+<!--main-->
+<div class="dashboard">
+   
+  <!--panel de acciones--> 
+  <div class="panel watchlist" id="watchlist">
+    <div class="resizer-watchlist" id="drag-watchlist"></div>
+    <div class="panel-header">Acciones (Futuros)</div>
+
+    <div class="asset-row clickable" onclick="cambiarMoneda('ABC.A')" data-symbol="ABC.A">
+     <span>ABC.A</span>
+     <span id="ABC.A" class="ABC.A">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('BPV')" data-symbol="BPV">
+     <span>BPV</span>
+     <span id="BPV" class="BPV">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('BNC')" data-symbol="BNC">
+        <span>BNC</span>
+        <span id="BNC" class="price-val">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('PGR')" data-symbol="PGR">
+        <span>PGR</span>
+        <span id="PGR" class="PGR">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('TPG')" data-symbol="TPG">
+        <span>TPG</span>
+        <span id="TPG" class="TPG">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('RST')" data-symbol="RST">
+        <span>RST</span>
+        <span id="RST" class="RST">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('RST_B')" data-symbol="RST_B">
+        <span>RST_B</span>
+        <span id="RST_B" class="RST_B">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('SVS')" data-symbol="RST_B">
+        <span>SVS</span>
+        <span id="SVS" class="SVS">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('PCP_B')" data-symbol="PCP_B">
+        <span>PCP_B</span>
+        <span id="SVS" class="PCP_B">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('FNV')" data-symbol="FNV">
+        <span>FNV</span>
+        <span id="SVS" class="FNV">--</span>
+    </div>
+     <div class="asset-row clickable" onclick="cambiarMoneda('MVZ_A')" data-symbol="MVZ_A">
+        <span>MVZ_A</span>
+        <span id="MVZ_A" class="MVZ_A">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('MVZ.B')" data-symbol="MVZ_B">
+        <span>MVZ_B</span>
+        <span id="MVZ_B" class="MVZ_B">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('TDV.D')" data-symbol="TDV.D">
+        <span>TDV.D</span>
+        <span id="TDV.D" class="TDV.D">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('BVL')" data-symbol="BVL">
+        <span>BVL</span>
+        <span id="BVL" class="BVL">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('FNC')" data-symbol="FNC">
+        <span>FNC</span>
+        <span id="FNC" class="FNC">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('PTN')" data-symbol="PTN">
+        <span>PTN</span>
+        <span id="FNC" class="PTN">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('MPA')" data-symbol="MPA">
+        <span>MPA</span>
+        <span id="FNC" class="MPA">--</span>
+    </div>
+    <div class="asset-row clickable" onclick="cambiarMoneda('BVCC')" data-symbol="BVCC">
+        <span>BVCC</span>
+        <span id="FNC" class="BVCC">--</span>
+    </div>
+    
+    
+  </div>
+
+  <!-- Contenedor de la Gráfica fuera del watchlist -->
+  <div class="chart-container" style="position: relative;">
+    <div id="chart" style="width: 100%; height: 100%;"></div>
+  </div>
+
+</div>
+
+<!------------------------------------------- javascript -------------------------------------------------->
+<script src="https://unpkg.com/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="../static/js/index.js"></script>
+<script src="../static/js/tool/regla.js"></script>
+
+
+
+
+<script src="../static/js/tool/lineas.js"></script>
+<script src="../static/js/tool/rectangulo.js"></script>
+<script src="../static/js/tool/linea_horizontal.js"></script>
+<script src="../static/js/tool/fibonacci.js"></script>
+<script src="../static/js/tool/risk.js"></script>
+<script src="../static/js/tool/elliot.js"></script>
+
+<script src="../static/js/indicadores/adx.js"></script>
+<script src="../static/js/indicadores/macd.js"></script>
+<script src="../static/js/indicadores/rsi.js"></script>
+<script src="../static/js/indicadores/sma.js"></script>
+<script src="../static/js/indicadores/bolliger.js"></script>
+
+<!-- 
+<script src="../static/js/smc/fvg.js"></script>
+<script src="../static/js/smc/liquidez.js"></script>
+<script src="../static/js/smc/ordenblock.js"></script>
+<script src="../static/js/smc/boos_chotc.js"></script>
+
+<script src="../static/js/pivote/zonas_pivote.js"></script>
+
+
+<script src="../static/js/volumen/VPVR.js"></script>
+
+
+-->
+
+<script>
+    // Moneda visual: 'BS' (original) o 'EUR' (eurolizado)
+window.monedaVisual = window.monedaVisual || 'BS';
+
+function toggleMonedaVisual() {
+    window.monedaVisual = (window.monedaVisual === 'BS') ? 'EUR' : 'BS';
+
+    const btn = document.getElementById('btn-moneda-toggle');
+    if (btn) btn.innerText = window.monedaVisual;
+
+    console.log(`🔁 Moneda visual cambiada a: ${window.monedaVisual}`);
+    cargarGrafica();
+}
+</script>
+
+</body>
+</html>
