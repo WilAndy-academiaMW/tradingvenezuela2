@@ -14,6 +14,11 @@ window.trendLines = [];
 window.reglasGuardadas = [];
 window.panelCVDActivo = window.panelCVDActivo || false;
 
+// Variables para el Scroll Infinito (Carga de historial antiguo)
+window.velasCargadas = 0;
+window.cargandoVelas = false;
+window.maxVelasPorBloque = 500; // Cuántas velas traer por cada petición
+
 const chartElement = document.getElementById('chart');
 
 // ==========================================
@@ -103,9 +108,56 @@ window.candlestickSeries = window.chart.addCandlestickSeries({
 });
 window.lineSeries = window.candlestickSeries;
 
+// ==========================================
+// FUNCIÓN AUXILIAR PARA FORMATEAR DATOS (Evita repetir código)
+// ==========================================
+function formatearDatos(filas, tf) {
+    const leer = (row, ...nombres) => {
+        for (const n of nombres) {
+            if (row[n] !== undefined && row[n] !== null && row[n] !== '') {
+                return parseFloat(row[n]);
+            }
+        }
+        return 0;
+    };
+
+    const validRows = filas.filter(row => {
+        const max = leer(row, 'Max.', 'Max');
+        const min = leer(row, 'Min.', 'Min');
+        return row.Fecha && (max !== 0 || min !== 0);
+    });
+
+    let formattedData = validRows.map(row => {
+        const ts = row.Fecha;
+        const dateObj = new Date(ts);
+        if (isNaN(dateObj.getTime())) return null;
+
+        let finalTime = (tf === '1d' || tf === '1w' || tf === '1M')
+            ? dateObj.toISOString().split('T')[0]
+            : Math.floor(dateObj.getTime() / 1000);
+
+        return {
+            time:   finalTime,
+            open:   leer(row, 'Apert.', 'Apertura'),
+            high:   leer(row, 'Max.',   'Max'),
+            low:    leer(row, 'Min.',   'Min'),
+            close:  leer(row, 'Cierre'),
+            volume: leer(row, 'VOLUMEN'),
+        };
+    }).filter(item => item !== null);
+
+    return formattedData.sort((a, b) => {
+        const t1 = typeof a.time === 'string' ? new Date(a.time).getTime() : a.time * 1000;
+        const t2 = typeof b.time === 'string' ? new Date(b.time).getTime() : b.time * 1000;
+        return t1 - t2;
+    });
+}
+
+// ==========================================
+// 5. CARGA INICIAL DE LA GRÁFICA (RÁPIDA)
+// ==========================================
 function cargarGrafica() {
     const tf = window.temporalidadActual;
-
     const simboloArchivo = window.monedaActual.replace('/', '_').replace('.', '_');
 
     let temporalidadEndpoint;
@@ -114,11 +166,13 @@ function cargarGrafica() {
     else                   temporalidadEndpoint = '1day';
 
     const divisaEndpoint = (window.monedaVisual === 'EUR') ? 'euro' : 'ves';
-
     const API_BASE = window.API_BASE || 'https://api.tradingvenezuela.com';
-    const url = `${API_BASE}/api/acciones/${temporalidadEndpoint}/${divisaEndpoint}/${simboloArchivo}`;
+    
+    // 👇 Pedimos solo las primeras 500 velas para que cargue volando
+    const url = `${API_BASE}/api/acciones/${temporalidadEndpoint}/${divisaEndpoint}/${simboloArchivo}?limit=${window.maxVelasPorBloque}`;
 
     console.log(`Intentando cargar data [tf=${tf}, moneda=${window.monedaVisual}] desde:`, url);
+    window.cargandoVelas = true;
 
     fetch(url)
         .then(response => {
@@ -126,56 +180,17 @@ function cargarGrafica() {
             return response.json();
         })
         .then(data => {
-            console.log(`📊 Datos recibidos para ${window.monedaActual} [${tf} - ${window.monedaVisual}]:`, data);
-
             const filas = (data && data.datos) ? data.datos : [];
 
             if (!filas.length) {
                 console.error("❌ El endpoint devolvió 0 filas para:", url);
+                window.cargandoVelas = false;
                 return;
             }
 
-            // Helper para leer columnas con o sin punto
-            const leer = (row, ...nombres) => {
-                for (const n of nombres) {
-                    if (row[n] !== undefined && row[n] !== null && row[n] !== '') {
-                        return parseFloat(row[n]);
-                    }
-                }
-                return 0;
-            };
+            const formattedData = formatearDatos(filas, tf);
 
-            const validRows = filas.filter(row => {
-                const max = leer(row, 'Max.', 'Max');
-                const min = leer(row, 'Min.', 'Min');
-                return row.Fecha && (max !== 0 || min !== 0);
-            });
-
-            let formattedData = validRows.map(row => {
-                const ts = row.Fecha;
-                const dateObj = new Date(ts);
-                if (isNaN(dateObj.getTime())) return null;
-
-                let finalTime = (tf === '1d' || tf === '1w' || tf === '1M')
-                    ? dateObj.toISOString().split('T')[0]
-                    : Math.floor(dateObj.getTime() / 1000);
-
-                return {
-                    time:   finalTime,
-                    open:   leer(row, 'Apert.', 'Apertura'),
-                    high:   leer(row, 'Max.',   'Max'),
-                    low:    leer(row, 'Min.',   'Min'),
-                    close:  leer(row, 'Cierre'),
-                    volume: leer(row, 'VOLUMEN'),
-                };
-            }).filter(item => item !== null);
-
-            formattedData.sort((a, b) => {
-                const t1 = typeof a.time === 'string' ? new Date(a.time).getTime() : a.time * 1000;
-                const t2 = typeof b.time === 'string' ? new Date(b.time).getTime() : b.time * 1000;
-                return t1 - t2;
-            });
-
+            // Actualizar precio superior
             if (formattedData.length > 0) {
                 const ultimoDato = formattedData[formattedData.length - 1];
                 const precioDisplay = document.getElementById('price-display');
@@ -187,41 +202,91 @@ function cargarGrafica() {
             }
 
             window.seriesData = formattedData;
+            window.velasCargadas = formattedData.length;
             window.candlestickSeries.setData(formattedData);
             window.chart.priceScale('right').applyOptions({ autoScale: true });
 
-                        setTimeout(() => {
-                // En lugar de fitContent(), le decimos que muestre solo las últimas N velas
+            // Enfocar las últimas 100 velas
+            setTimeout(() => {
                 const totalVelas = formattedData.length;
-                const velasAMostrar = 100; // Puedes cambiar este número (ej. 50, 150, 200)
+                const velasAMostrar = 100; 
                 
                 if (totalVelas > velasAMostrar) {
-                    // Si hay más de 100 velas, mostramos desde la posición (total - 100) hasta el final
                     window.chart.timeScale().setVisibleLogicalRange({
                         from: totalVelas - velasAMostrar,
                         to: totalVelas
                     });
                 } else {
-                    // Si hay menos de 100 velas en total, mostramos todo
                     window.chart.timeScale().fitContent();
                 }
             }, 50);
 
-            console.log(`✅ Gráfico actualizado [${tf} - ${window.monedaVisual}] para ${window.monedaActual} (${formattedData.length} velas)`);
+            console.log(`✅ Gráfico inicial actualizado (${formattedData.length} velas)`);
+            window.cargandoVelas = false;
         })
         .catch(err => {
-            console.error(`❌ Error al cargar data [${tf} - ${window.monedaVisual}] para:`, window.monedaActual, url, err);
+            console.error(`❌ Error al cargar data:`, err);
+            window.cargandoVelas = false;
         });
 }
 
 // ==========================================
-// 6. GESTIÓN DE CLICS EN EL GRÁFICO (DIBUJOS)
+// 6. SCROLL INFINITO (CARGA DE HISTORIAL ANTIGUO)
+// ==========================================
+window.chart.timeScale().subscribeVisibleLogicalRangeChange(logicalRange => {
+    // Si estamos cargando, o no hay datos, o el usuario no está en el borde izquierdo, ignorar
+    if (window.cargandoVelas || !logicalRange || logicalRange.from > 10) return;
+
+    // Si el usuario llega al borde izquierdo (índice 0), pedimos más velas
+    if (logicalRange.from <= 0) {
+        window.cargandoVelas = true;
+        console.log("⏳ Llegaste al principio. Cargando 500 velas más antiguas...");
+
+        const tf = window.temporalidadActual;
+        const simboloArchivo = window.monedaActual.replace('/', '_').replace('.', '_');
+        let temporalidadEndpoint = (tf === '1w') ? '1week' : (tf === '1M') ? '1month' : '1day';
+        const divisaEndpoint = (window.monedaVisual === 'EUR') ? 'euro' : 'ves';
+        const API_BASE = window.API_BASE || 'https://api.tradingvenezuela.com';
+
+        // Pedimos las siguientes 500 usando el offset
+        const url = `${API_BASE}/api/acciones/${temporalidadEndpoint}/${divisaEndpoint}/${simboloArchivo}?limit=${window.maxVelasPorBloque}&offset=${window.velasCargadas}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const filas = data.datos || [];
+                if (!filas.length) {
+                    console.log("📭 No hay más velas antiguas en el servidor (llegaste al 2020).");
+                    window.cargandoVelas = false;
+                    return;
+                }
+
+                const nuevasVelas = formatearDatos(filas, tf);
+                
+                // Unimos las velas nuevas (viejas) con las que ya estaban en pantalla
+                const dataCombinada = [...nuevasVelas, ...window.seriesData];
+                window.seriesData = dataCombinada;
+                window.velasCargadas = dataCombinada.length;
+
+                // Actualizamos la gráfica sin que salte de posición
+                window.candlestickSeries.setData(dataCombinada);
+                console.log(`✅ Se añadieron ${nuevasVelas.length} velas antiguas.`);
+                window.cargandoVelas = false;
+            })
+            .catch(err => {
+                console.error("❌ Error cargando velas antiguas:", err);
+                window.cargandoVelas = false;
+            });
+    }
+});
+
+// ==========================================
+// 7. GESTIÓN DE CLICS EN EL GRÁFICO (DIBUJOS)
 // ==========================================
 window.chart.subscribeClick((param) => {
     if (!param.point || !param.time) return;
     const price = window.candlestickSeries.coordinateToPrice(param.point.y);
 
-    // 🔧 Normalizamos el time al formato de las velas según la temporalidad
     const tf = window.temporalidadActual;
     let time = param.time;
     if (tf === '1d' || tf === '1w') {
@@ -255,7 +320,6 @@ window.chart.subscribeClick((param) => {
             if (typeof guardarLineaBD === 'function') {
                 guardarLineaBD(p1, p2, 'trendline', '#FFD700');
             }
-
             window.desactivarModoDibujo();
         }
         return;
@@ -285,7 +349,8 @@ window.chart.subscribeClick((param) => {
     }
 });
 
-// 7. SINCRONIZACIÓN DE ZOOM Y MOVIMIENTO
+// ==========================================
+// 8. SINCRONIZACIÓN DE ZOOM Y MOVIMIENTO
 // ==========================================
 window.renderPending = false;
 window.chart.timeScale().subscribeVisibleTimeRangeChange(() => {
@@ -293,32 +358,24 @@ window.chart.timeScale().subscribeVisibleTimeRangeChange(() => {
     window.renderPending = true;
 
     requestAnimationFrame(() => {
-        // Actualizar líneas de tendencia
         if (window.trendLines && Array.isArray(window.trendLines)) {
             window.trendLines.forEach(linea => {
-                if (linea && typeof linea.actualizar === 'function') {
-                    linea.actualizar();
-                }
+                if (linea && typeof linea.actualizar === 'function') linea.actualizar();
             });
         }
         window.horizontalLines?.forEach(l => l?.actualizar?.());
         window.rectangles?.forEach(r => r?.actualizar?.());
-
-        // 🚀 ¡AQUÍ ESTABA FALTANDO CONECTARLO! Actualizar las posiciones de Riesgo (RR)
         if (window.riesgosGuardados && Array.isArray(window.riesgosGuardados)) {
             window.riesgosGuardados.forEach(riesgo => {
-                if (riesgo && typeof riesgo.actualizar === 'function') {
-                    riesgo.actualizar();
-                }
+                if (riesgo && typeof riesgo.actualizar === 'function') riesgo.actualizar();
             });
         }
-
         window.renderPending = false;
     });
 });
 
 // ==========================================
-// 8. CAMBIO DE MONEDA Y TEMPORALIDAD
+// 9. CAMBIO DE MONEDA Y TEMPORALIDAD
 // ==========================================
 function cambiarMoneda(simbolo) {
     window.monedaActual = simbolo;
@@ -368,7 +425,6 @@ document.addEventListener('DOMContentLoaded', function() {
     asegurarDrawingLayer();
 });
 
-// Limpieza total
 function limpiarTodo() {
     if (window.limpiarFibo) window.limpiarFibo();
     if (typeof window.limpiarLineasTendencia === 'function') {
@@ -377,7 +433,7 @@ function limpiarTodo() {
 }
 
 // ==========================================
-// 9. MARCA DE AGUA
+// 10. MARCA DE AGUA
 // ==========================================
 function actualizarMarcaDeAgua() {
     const chartContainer = document.querySelector('.chart-container');
@@ -401,6 +457,10 @@ function actualizarMarcaDeAgua() {
     `;
 }
 
-// Carga inicial al abrir la página
-actualizarMarcaDeAgua();
+// ==========================================
+// 11. ARRANQUE INICIAL
+// ==========================================
+actualizarMarcaDeAgua(); // 👈 Para que la marca de agua salga desde el segundo 0
+const headerInicial = document.getElementById('current-symbol');
+if (headerInicial) headerInicial.innerText = window.monedaActual;
 cargarGrafica();
