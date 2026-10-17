@@ -49,15 +49,7 @@
     <div class="brand-title">
         THE PRINCE
     </div>
-<div class="tf-container">
-    <button id="btn-moneda-toggle" onclick="toggleMonedaVisual()" class="tf-btn" title="Cambiar entre Bs y EUR">
-        BS
-    </button>
 
-    <button onclick="cambiarTF('1d', this)" class="tf-btn">1D</button>
-    <button onclick="cambiarTF('1w', this)" class="tf-btn">1W</button>
-    <button onclick="cambiarTF('1M', this)" class="tf-btn">1M</button>
-</div>
     <!-- Centro: El nuevo menú de herramientas analíticas (Dropdowns) -->
     <div class="toolbar-dropdowns no-scrollbar">
 
@@ -133,15 +125,20 @@
                 <div onclick="limpiarTodo()" class="dropdown-item item-danger"><span>🔥</span> Borrar Todo</div>
             </div>
         </div>
+
+        <div class="tf-container">
+    <button id="btn-moneda-toggle" onclick="toggleMonedaVisual()" class="tf-btn" title="Cambiar entre Bs y EUR">
+        BS
+    </button>
+
+    <button onclick="cambiarTF('1d', this)" class="tf-btn">1D</button>
+    <button onclick="cambiarTF('1w', this)" class="tf-btn">1W</button>
+    <button onclick="cambiarTF('1M', this)" class="tf-btn">1M</button>
+</div>
     </div>
 
     <!-- Lado Derecho: Selectores de Timeframes -->
-    <div class="tf-container">
-        
-        <button onclick="cambiarTF('1d', this)" class="tf-btn">1D</button>
-        <button onclick="cambiarTF('1w', this)" class="tf-btn">1W</button>
-         <button onclick="cambiarTF('1M', this)" class="tf-btn">1M</button>
-    </div>
+    
 </header>
 
 <!--main-->

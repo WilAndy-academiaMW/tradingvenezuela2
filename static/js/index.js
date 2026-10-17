@@ -402,4 +402,5 @@ function actualizarMarcaDeAgua() {
 }
 
 // Carga inicial al abrir la página
+actualizarMarcaDeAgua();
 cargarGrafica();
