@@ -2,7 +2,7 @@
 // RESUMEN - Solo llena las 4 tarjetas del símbolo activo
 // ============================================================================
 
-const API_BASE = 'http://185.217.125.181:5000';
+const url = `https://api.tradingvenezuela.com/api/resumen?_=${Date.now()}`;
 let simboloActual = 'ABC.A';
 
 // ============================================================================

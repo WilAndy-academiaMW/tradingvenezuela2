@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function cargarResumenSimbolo(symbol) {
         console.log(`📊 Cargando resumen para: ${symbol}`);
         try {
-            const url = `http://185.217.125.181:5000/api/resumen?_=${Date.now()}`;
+            fetch(`https://api.tradingvenezuela.com/api/resumen?...`)
             const res = await fetch(url);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const json = await res.json();
