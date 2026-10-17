@@ -115,7 +115,7 @@ function cargarGrafica() {
 
     const divisaEndpoint = (window.monedaVisual === 'EUR') ? 'euro' : 'ves';
 
-    const API_BASE = window.API_BASE || 'http://185.217.125.181:5000';
+    const API_BASE = window.API_BASE || 'https://api.tradingvenezuela.com';
     const url = `${API_BASE}/api/acciones/${temporalidadEndpoint}/${divisaEndpoint}/${simboloArchivo}`;
 
     console.log(`Intentando cargar data [tf=${tf}, moneda=${window.monedaVisual}] desde:`, url);
@@ -190,8 +190,21 @@ function cargarGrafica() {
             window.candlestickSeries.setData(formattedData);
             window.chart.priceScale('right').applyOptions({ autoScale: true });
 
-            setTimeout(() => {
-                window.chart.timeScale().fitContent();
+                        setTimeout(() => {
+                // En lugar de fitContent(), le decimos que muestre solo las últimas N velas
+                const totalVelas = formattedData.length;
+                const velasAMostrar = 100; // Puedes cambiar este número (ej. 50, 150, 200)
+                
+                if (totalVelas > velasAMostrar) {
+                    // Si hay más de 100 velas, mostramos desde la posición (total - 100) hasta el final
+                    window.chart.timeScale().setVisibleLogicalRange({
+                        from: totalVelas - velasAMostrar,
+                        to: totalVelas
+                    });
+                } else {
+                    // Si hay menos de 100 velas en total, mostramos todo
+                    window.chart.timeScale().fitContent();
+                }
             }, 50);
 
             console.log(`✅ Gráfico actualizado [${tf} - ${window.monedaVisual}] para ${window.monedaActual} (${formattedData.length} velas)`);

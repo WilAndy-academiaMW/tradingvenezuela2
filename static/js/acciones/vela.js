@@ -9,7 +9,7 @@
     const MAX_INTENTOS = 20;
 
     // ============ CONFIGURACIÓN ============
-    const API_BASE = 'http://185.217.125.181:5000';
+    const API_BASE = 'https://api.tradingvenezuela.com';
     const SIMBOLO_DEFAULT = 'ABC.A';
     const REFRESH_MS = 180000;
     const RADIO_MIN = 3;

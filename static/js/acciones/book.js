@@ -9,8 +9,8 @@ async function actualizarLibroOrdenes(symbol) {
         let simboloLimpio = symbol.toUpperCase().replace('_', '.');
         if (simboloLimpio === 'ABC_A') simboloLimpio = 'ABC.A';
 
-        const res = await fetch(`http://185.217.125.181:5000/api/simbolo/${encodeURIComponent(simboloLimpio)}?_=${Date.now()}`);
-        
+        const res = await fetch(`https://api.tradingvenezuela.com/api/simbolo/${encodeURIComponent(simboloLimpio)}?_=${Date.now()}`);
+
         if (!res.ok) {
             const errData = await res.json().catch(() => ({}));
             throw new Error(`Error HTTP ${res.status}: ${errData.error || 'No encontrado'}`);

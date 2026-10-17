@@ -7,7 +7,7 @@ let deltaOpsInterval = null;
 let simboloDeltaOps = 'BNC';
 
 // Config
-const API_BASE_OPS = 'http://185.217.125.181:5000';
+const API_BASE_OPS = 'https://api.tradingvenezuela.com';
 const REFRESH_MS_OPS = 60000; // 1 min
 const MAX_FILAS = 15;
 

@@ -41,7 +41,7 @@ async function actualizarDelta(symbol) {
     if (limpio.endsWith('USDT')) limpio = limpio.replace('USDT', '').replace('_', '');
 
     // URL COMPLETA DIRECTA AL VPS (Evita errores de rutas relativas y CORS local)
-    const url = `http://185.217.125.181:5000/api/delta-cvd/${encodeURIComponent(limpio)}`;
+    const url = `https://api.tradingvenezuela.com/api/delta-cvd/${encodeURIComponent(limpio)}`;
 
     console.log(`🌐 [CVD] Fetch → ${url}`);
 
