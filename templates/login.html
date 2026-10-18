@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso - Trading Venezuela</title>
+  <style>
+    body { background-color: #0b0e11; color: #d1d4dc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .container { background: #1e222d; padding: 30px; border-radius: 10px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    h2 { text-align: center; margin-bottom: 20px; color: #fff; }
+    input { width: 100%; padding: 10px; margin-bottom: 15px; background: #2a2e39; border: 1px solid #485c7b; color: white; border-radius: 5px; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+    button:hover { background: #2563eb; }
+    .toggle-link { text-align: center; display: block; color: #3b82f6; cursor: pointer; font-size: 14px; margin-top: 10px; text-decoration: none; }
+    .error { color: #ef5350; font-size: 14px; text-align: center; margin-bottom: 10px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2 id="title">Iniciar Sesión</h2>
+    <div id="error-msg" class="error"></div>
+
+    <form id="auth-form" novalidate> 
+      <input type="text" id="usuario" placeholder="Usuario" required>
+      <input type="password" id="password" placeholder="Contraseña" required>
+      
+      <!-- Solo se muestra al registrarse -->
+      <input type="email" id="email-recuperacion" placeholder="Correo real (para recuperar clave)" class="hidden">
+      
+      <button type="submit" id="btn-submit">Entrar</button>
+    </form>
+
+    <a id="btn-toggle-mode" class="toggle-link">¿No tienes cuenta? Regístrate aquí</a>
+  </div>
+
+  <script>
+    // ⚠️ CAMBIA ESTO POR LA IP REAL DE TU VPS
+    const API_URL =  "https://api.tradingvenezuela.com/api";
+
+    let isRegisterMode = false;
+    const form = document.getElementById('auth-form');
+    const title = document.getElementById('title');
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnToggle = document.getElementById('btn-toggle-mode');
+    const inputEmailRecuperacion = document.getElementById('email-recuperacion');
+    const errorMsg = document.getElementById('error-msg');
+
+    btnToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      isRegisterMode = !isRegisterMode;
+      errorMsg.textContent = '';
+      form.reset();
+      
+      if (isRegisterMode) {
+        title.textContent = "Crear Cuenta";
+        btnSubmit.textContent = "Registrarse";
+        inputEmailRecuperacion.classList.remove('hidden');
+        btnToggle.textContent = "¿Ya tienes cuenta? Inicia sesión";
+      } else {
+        title.textContent = "Iniciar Sesión";
+        btnSubmit.textContent = "Entrar";
+        inputEmailRecuperacion.classList.add('hidden');
+        btnToggle.textContent = "¿No tienes cuenta? Regístrate aquí";
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.textContent = '';
+      btnSubmit.disabled = true;
+      
+      const usuario = document.getElementById('usuario').value.trim();
+      const password = document.getElementById('password').value;
+      const emailRec = inputEmailRecuperacion.value.trim();
+
+      try {
+        if (isRegisterMode) {
+          if (!emailRec.includes('@')) throw new Error("El correo debe ser válido.");
+
+          const respuesta = await fetch(`${API_URL}/registro`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                nombre_usuario: usuario, 
+                password: password,
+                correo_real: emailRec 
+            })
+          });
+          const data = await respuesta.json();
+
+          if (!respuesta.ok) throw new Error(data.error);
+          
+          alert("¡Registro exitoso! Ahora inicia sesión.");
+          btnToggle.click(); // Cambiar a modo login
+          
+        } else {
+          const respuesta = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre_usuario: usuario, password: password })
+          });
+          const data = await respuesta.json();
+
+          if (!respuesta.ok) throw new Error(data.error);
+
+          alert(`Bienvenido ${data.usuario}`);
+          window.location.href = "index.html"; // Redirigir a tu gráfico
+        }
+      } catch (error) {
+        errorMsg.textContent = error.message; 
+      } finally {
+        btnSubmit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

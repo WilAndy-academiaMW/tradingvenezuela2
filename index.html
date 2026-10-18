@@ -18,11 +18,14 @@
       <div class="nav-links">
         <a href="templates/index.html" class="active">Grafica</a>
         <a href="templates/index2.html">Acciones</a>
+        
+        <!-- 👇 NUEVO BOTÓN DE LOGIN / REGISTRO 👇 -->
+        <a href="templates/login.html" id="btn-auth" style="background-color: #3b82f6; color: white; padding: 5px 15px; border-radius: 5px; text-decoration: none; margin-left: 15px;">Iniciar Sesión</a>
       </div>
     </div>
   </nav>
 
-  <!-- HEADER -->
+  <!-- (El resto de tu HTML sigue igual...) -->
   <header class="page-header">
     <div class="page-header-inner">
       <div>
@@ -41,65 +44,70 @@
 
   <!-- ÍNDICES -->
   <section class="indices-section">
-    <div id="panel-indices" class="indices-grid">
-      <!-- JS llena esto -->
-    </div>
+    <div id="panel-indices" class="indices-grid"></div>
   </section>
 
   <!-- STATS -->
   <section class="stats-section">
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">TOTAL ACCIONES</div>
-        <div id="stat-total" class="stat-value white">--</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">SUBIENDO 🟢</div>
-        <div id="stat-up" class="stat-value up">--</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">BAJANDO 🔴</div>
-        <div id="stat-down" class="stat-value down">--</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">SIN CAMBIO ⚪</div>
-        <div id="stat-equal" class="stat-value equal">--</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">MONTO TOTAL</div>
-        <div id="stat-monto" class="stat-value gold">--</div>
-      </div>
+      <div class="stat-card"><div class="stat-label">TOTAL ACCIONES</div><div id="stat-total" class="stat-value white">--</div></div>
+      <div class="stat-card"><div class="stat-label">SUBIENDO 🟢</div><div id="stat-up" class="stat-value up">--</div></div>
+      <div class="stat-card"><div class="stat-label">BAJANDO 🔴</div><div id="stat-down" class="stat-value down">--</div></div>
+      <div class="stat-card"><div class="stat-label">SIN CAMBIO ⚪</div><div id="stat-equal" class="stat-value equal">--</div></div>
+      <div class="stat-card"><div class="stat-label">MONTO TOTAL</div><div id="stat-monto" class="stat-value gold">--</div></div>
     </div>
   </section>
 
   <!-- CONTENIDO -->
   <main class="content">
-
-    <!-- VISTA TABLA -->
     <section id="vista-tabla" class="view">
       <div class="table-wrapper">
         <div class="table-header">
-          <span>LOGO</span>
-          <span>SÍMBOLO</span>
-          <span>NOMBRE</span>
-          <span class="right">PRECIO (Bs)</span>
-          <span class="right">VAR %</span>
-          <span class="right">VOLUMEN</span>
-          <span class="right">MONTO (Bs)</span>
+          <span>LOGO</span><span>SÍMBOLO</span><span>NOMBRE</span>
+          <span class="right">PRECIO (Bs)</span><span class="right">VAR %</span>
+          <span class="right">VOLUMEN</span><span class="right">MONTO (Bs)</span>
         </div>
         <div id="tabla-acciones" class="table-body"></div>
       </div>
     </section>
-
-    <!-- VISTA HEATMAP -->
     <section id="vista-heatmap" class="view hidden">
-      <div class="heatmap-wrapper">
-        <div id="heatmap" class="heatmap-grid"></div>
-      </div>
+      <div class="heatmap-wrapper"><div id="heatmap" class="heatmap-grid"></div></div>
     </section>
-
   </main>
 
   <script src="static/js/inicio.js"></script>
+
+  <!-- 👇 SCRIPTS DE FIREBASE 👇 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // REEMPLAZA ESTO CON TU firebaseConfig DE FIREBASE
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "tu-proyecto.firebaseapp.com",
+      projectId: "tu-proyecto",
+      storageBucket: "tu-proyecto.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Cambiar el botón si el usuario ya está logueado
+    onAuthStateChanged(auth, (user) => {
+      const btn = document.getElementById('btn-auth');
+      if (user) {
+        btn.textContent = "Mi Perfil / Salir";
+        btn.style.backgroundColor = "#10b981"; // Verde
+        btn.href = "templates/perfil.html";
+      } else {
+        btn.textContent = "Iniciar Sesión / Registrarse";
+        btn.style.backgroundColor = "#3b82f6"; // Azul
+        btn.href = "templates/login.html";
+      }
+    });
+  </script>
 </body>
 </html>

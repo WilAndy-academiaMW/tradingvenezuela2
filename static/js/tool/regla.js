@@ -2,8 +2,7 @@ let reglaToolActive = false;
 let reglaPrimerPunto = null;
 let reglaTemporal = null;
 let isReglaDrawingFrame = false;
-let ultimoClickRegla = 0;
-const DOBLE_CLICK_MS = 350;
+let esperandoBorrarRegla = false; 
 
 if (!window.reglasGuardadas) window.reglasGuardadas = [];
 
@@ -15,7 +14,8 @@ function toggleReglaTool() {
     if (reglaToolActive) {
         if (btn) btn.classList.replace('bg-gray-800', 'bg-purple-600');
         window.chart.applyOptions({ handleScroll: false, handleScale: false });
-        console.log("📏 Regla Avanzada Activa");
+        esperandoBorrarRegla = false;
+        console.log("📏 Regla Activa. Haz clic para empezar.");
     } else {
         desactivarReglaTool();
     }
@@ -24,6 +24,7 @@ function toggleReglaTool() {
 function desactivarReglaTool() {
     reglaToolActive = false;
     reglaPrimerPunto = null;
+    esperandoBorrarRegla = false;
     if (reglaTemporal) {
         window.chart.removeSeries(reglaTemporal);
         reglaTemporal = null;
@@ -31,11 +32,12 @@ function desactivarReglaTool() {
     const btn = document.getElementById('btnRegla');
     if (btn) btn.classList.replace('bg-purple-600', 'bg-gray-800');
     window.chart.applyOptions({ handleScroll: true, handleScale: true });
+    console.log("🛑 Herramienta Regla desactivada.");
 }
 
 // --- DIBUJO EN TIEMPO REAL ---
 window.chart.subscribeCrosshairMove(param => {
-    if (!reglaToolActive || !reglaPrimerPunto || !reglaTemporal || !param.point || isReglaDrawingFrame) return;
+    if (esperandoBorrarRegla || !reglaToolActive || !reglaPrimerPunto || !reglaTemporal || !param.point || isReglaDrawingFrame) return;
 
     isReglaDrawingFrame = true;
     requestAnimationFrame(() => {
@@ -84,33 +86,22 @@ window.chart.subscribeCrosshairMove(param => {
     });
 });
 
-// --- FIJAR MEDICIÓN CON CLICK + DOBLE CLICK PARA BORRAR ---
+// --- LÓGICA DE CLICS ---
 window.chart.subscribeClick(param => {
     if (!param.point) return;
+    if (!reglaToolActive) return;
 
-    const ahora = Date.now();
-    const esDobleClick = (ahora - ultimoClickRegla) < DOBLE_CLICK_MS;
-    ultimoClickRegla = ahora;
-
-    // Doble clic: borrar la última regla (o la que se está dibujando)
-    if (esDobleClick) {
-        if (reglaTemporal) {
-            // Está dibujando: cancelar la actual
-            try { window.chart.removeSeries(reglaTemporal); } catch (e) {}
-            reglaTemporal = null;
-            reglaPrimerPunto = null;
-            console.log("🗑️ Regla en dibujo eliminada (doble clic)");
-        } else if (window.reglasGuardadas && window.reglasGuardadas.length > 0) {
-            // Borrar la última regla guardada
+    if (esperandoBorrarRegla) {
+        if (window.reglasGuardadas.length > 0) {
             const ultima = window.reglasGuardadas.pop();
             try { window.chart.removeSeries(ultima); } catch (e) {}
-            console.log("🗑️ Última regla eliminada (doble clic)");
+            console.log("🗑️ Regla borrada con un clic.");
         }
-        return;
+        
+        // 👇 AQUÍ ESTÁ LA MAGIA: Al borrar, apagamos la herramienta y liberamos el scroll 👇
+        desactivarReglaTool(); 
+        return; 
     }
-
-    // Un solo clic: comportamiento normal de la herramienta
-    if (!reglaToolActive) return;
 
     const precioClick = window.candlestickSeries.coordinateToPrice(param.point.y);
     const tiempoClick = param.time || obtenerTiempoReal(param);
@@ -128,15 +119,18 @@ window.chart.subscribeClick(param => {
             priceLineVisible: false,
             crosshairMarkerVisible: false,
         });
+        console.log("📍 Iniciando regla...");
     } else {
         window.reglasGuardadas.push(reglaTemporal);
         reglaTemporal = null;
         reglaPrimerPunto = null;
-        desactivarReglaTool();
+        
+        esperandoBorrarRegla = true; 
+        console.log("✅ Regla fijada. Haz OTRO clic para borrarla (se apagará la herramienta).");
     }
 });
 
-// --- LIMPIAR TODO (botón) ---
+// --- LIMPIAR TODO (Botón de la escoba) ---
 function limpiarRegla() {
     console.log("🧹 Limpiando reglas...");
 
@@ -153,10 +147,10 @@ function limpiarRegla() {
     }
 
     reglaPrimerPunto = null;
+    esperandoBorrarRegla = false;
+    desactivarReglaTool();
 
-    if (reglaToolActive) desactivarReglaTool();
-
-    console.log("✅ Reglas eliminadas");
+    console.log("✅ Todo limpio.");
 }
 
 window.limpiarRegla = limpiarRegla;
