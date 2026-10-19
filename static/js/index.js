@@ -184,15 +184,7 @@ function formatearDatos(filas, tf) {
 // ==========================================
 // 5. CARGA INICIAL DE LA GRÁFICA
 // ==========================================
-// ==========================================
-// 5. CARGA INICIAL DE LA GRÁFICA (PROGRESIVA)
-// ==========================================
-// ==========================================
-// 5. CARGA INICIAL DE LA GRÁFICA (ULTRA RÁPIDA + ZOOM FIJO)
-// ==========================================
-// ==========================================
-// 5. CARGA INICIAL DE LA GRÁFICA (STREAMING POR LOTES)
-// ==========================================
+
 async function cargarGrafica() {
     const tf = window.temporalidadActual;
     const simboloArchivo = window.monedaActual.replace('/', '_').replace('.', '_');

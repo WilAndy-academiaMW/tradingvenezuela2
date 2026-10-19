@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Suscripción - Trading Venezuela</title>
+  <style>
+    body { 
+      background-color: #0b0e11; 
+      color: #d1d4dc; 
+      font-family: sans-serif; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+      margin: 0; 
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .card { 
+      background: #1e222d; 
+      padding: 40px 30px; 
+      border-radius: 15px; 
+      width: 100%; 
+      max-width: 500px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+    }
+    h2 { 
+      margin-top: 0; 
+      color: #fff; 
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #8b92a5;
+      margin-bottom: 30px;
+      font-size: 15px;
+    }
+    .benefits-list {
+      text-align: left;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 35px 0;
+    }
+    .benefits-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid #2a2e39;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+    }
+    .benefits-list li:last-child {
+      border-bottom: none;
+    }
+    .check-icon {
+      color: #10b981;
+      font-weight: bold;
+      font-size: 18px;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 4px 8px;
+      border-radius: 50%;
+    }
+    .btn-whatsapp {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px;
+      background-color: #25D366;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 18px;
+      transition: background-color 0.3s, transform 0.2s;
+      box-sizing: border-box;
+    }
+    .btn-whatsapp:hover {
+      background-color: #1ebe5a;
+      transform: translateY(-2px);
+    }
+    .btn-logout {
+      display: block;
+      margin-top: 20px;
+      color: #ef5350;
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-logout:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Plan Premium</h2>
+    <p class="subtitle">Desbloquea todo el potencial de la Bolsa de Caracas.</p>
+
+    <ul class="benefits-list">
+      <li><span class="check-icon">✓</span> Acceso total al gráfico interactivo</li>
+      <li><span class="check-icon">✓</span> Datos en tiempo real (VES y EUR)</li>
+      <li><span class="check-icon">✓</span> Todas las herramientas de dibujo (Fibo, Reglas, Tendencias)</li>
+      <li><span class="check-icon">✓</span> análisis de flujo de órdenes (CVD)</li>
+      <li><span class="check-icon">✓</span> Soporte prioritario directo con el administrador</li>
+    </ul>
+
+    <!-- Botón de WhatsApp con mensaje preescrito -->
+    <a href="https://wa.me/5841244895212?text=Hola,%20estoy%20interesado%20en%20suscribirme%20al%20plan%20Premium%20de%20Trading%20Venezuela.%20Mi%20usuario%20es:%20" 
+       target="_blank" 
+       class="btn-whatsapp">
+      
+      <!-- Icono de WhatsApp SVG -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+      </svg>
+
+      Pagar / Suscribirse por WhatsApp
+    </a>
+
+    <a class="btn-logout" id="btn-logout">Cerrar Sesión</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Verificamos si está logueado
+      const usuario = localStorage.getItem('usuarioLogueado');
+      
+      // Si no hay usuario, lo pateamos al login
+      if (!usuario) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // 2. Personalizamos el mensaje de WhatsApp con su nombre de usuario
+      const btnWhatsApp = document.querySelector('.btn-whatsapp');
+      const mensajeBase = "Hola, estoy interesado en suscribirme al plan Premium de Trading Venezuela. Mi usuario es: ";
+      const mensajeFinal = encodeURIComponent(mensajeBase + usuario);
+      btnWhatsApp.href = `https://wa.me/5841244895212?text=${mensajeFinal}`;
+
+      // 3. Lógica para Cerrar Sesión
+      document.getElementById('btn-logout').addEventListener('click', () => {
+        localStorage.removeItem('usuarioLogueado'); // Borramos la sesión
+        window.location.href = "../index.html"; // Volvemos al inicio público
+      });
+    });
+  </script>
+</body>
+</html>

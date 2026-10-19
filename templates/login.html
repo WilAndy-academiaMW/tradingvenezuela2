@@ -36,7 +36,7 @@
   </div>
 
   <script>
-    // ⚠️ CAMBIA ESTO POR LA IP REAL DE TU VPS
+    // ⚠️ URL DE TU API
     const API_URL =  "https://api.tradingvenezuela.com/api";
 
     let isRegisterMode = false;
@@ -92,7 +92,7 @@
 
           if (!respuesta.ok) throw new Error(data.error);
           
-          alert("¡Registro exitoso! Ahora inicia sesión.");
+          alert("¡Registro exitoso! Tu cuenta está pendiente de activación por un administrador. Por favor, inicia sesión más tarde.");
           btnToggle.click(); // Cambiar a modo login
           
         } else {
@@ -105,8 +105,11 @@
 
           if (!respuesta.ok) throw new Error(data.error);
 
+          // 👇 AQUÍ GUARDAMOS LA SESIÓN EN EL NAVEGADOR 👇
+          localStorage.setItem('usuarioLogueado', data.usuario);
+          
           alert(`Bienvenido ${data.usuario}`);
-          window.location.href = "index.html"; // Redirigir a tu gráfico
+          window.location.href = "usuario.html"; // Redirigir a tu gráfico
         }
       } catch (error) {
         errorMsg.textContent = error.message; 

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trading Venezuela - Panel Principal</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/inicio.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="logo">
+        <span class="logo-text">📈 Trading Venezuela</span>
+      </a>
+      <div class="nav-links">
+       <!-- <a href="templates/index.html" class="active">Grafica</a>
+        <a href="templates/index2.html">Acciones</a>
+        
+         👇 NUEVO BOTÓN DE LOGIN / REGISTRO 👇 -->
+        <a href="planes.html" id="btn-auth" style="background-color: #3b82f6; color: white; padding: 5px 15px; border-radius: 5px; text-decoration: none; margin-left: 15px;">SUSCRIBIRSE</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- (El resto de tu HTML sigue igual...) -->
+  <header class="page-header">
+    <div class="page-header-inner">
+      <div>
+        <h1>Mercado BVC</h1>
+        <p class="update-info">
+          Actualizado: <span id="ultima-actualizacion">--:--:--</span>
+          <span id="estado-loader" class="loader"></span>
+        </p>
+      </div>
+      <div class="view-tabs">
+        <button id="btn-vista-tabla"   class="tab-btn active" data-vista="tabla">📋 Tabla</button>
+        <button id="btn-vista-heatmap" class="tab-btn"        data-vista="heatmap">🔥 Mapa de Calor</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ÍNDICES -->
+  <section class="indices-section">
+    <div id="panel-indices" class="indices-grid"></div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">TOTAL ACCIONES</div><div id="stat-total" class="stat-value white">--</div></div>
+      <div class="stat-card"><div class="stat-label">SUBIENDO 🟢</div><div id="stat-up" class="stat-value up">--</div></div>
+      <div class="stat-card"><div class="stat-label">BAJANDO 🔴</div><div id="stat-down" class="stat-value down">--</div></div>
+      <div class="stat-card"><div class="stat-label">SIN CAMBIO ⚪</div><div id="stat-equal" class="stat-value equal">--</div></div>
+      <div class="stat-card"><div class="stat-label">MONTO TOTAL</div><div id="stat-monto" class="stat-value gold">--</div></div>
+    </div>
+  </section>
+
+  <!-- CONTENIDO -->
+  <main class="content">
+    <section id="vista-tabla" class="view">
+      <div class="table-wrapper">
+        <div class="table-header">
+          <span>LOGO</span><span>SÍMBOLO</span><span>NOMBRE</span>
+          <span class="right">PRECIO (Bs)</span><span class="right">VAR %</span>
+          <span class="right">VOLUMEN</span><span class="right">MONTO (Bs)</span>
+        </div>
+        <div id="tabla-acciones" class="table-body"></div>
+      </div>
+    </section>
+    <section id="vista-heatmap" class="view hidden">
+      <div class="heatmap-wrapper"><div id="heatmap" class="heatmap-grid"></div></div>
+    </section>
+  </main>
+
+  <script src="../static/js/inicio.js"></script>
+
+  <!-- 👇 SCRIPTS DE FIREBASE 👇 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // REEMPLAZA ESTO CON TU firebaseConfig DE FIREBASE
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "tu-proyecto.firebaseapp.com",
+      projectId: "tu-proyecto",
+      storageBucket: "tu-proyecto.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Cambiar el botón si el usuario ya está logueado
+    onAuthStateChanged(auth, (user) => {
+      const btn = document.getElementById('btn-auth');
+      if (user) {
+        btn.textContent = "Mi Perfil / Salir";
+        btn.style.backgroundColor = "#10b981"; // Verde
+        btn.href = "planes.html";
+      } else {
+        btn.textContent = "Suscribirse";
+        btn.style.backgroundColor = "#3b82f6"; // Azul
+        btn.href = "planes.html";
+      }
+    });
+  </script>
+</body>
+</html>

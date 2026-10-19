@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración - Suscripciones</title>
+  <style>
+    body { background-color: #0b0e11; color: #d1d4dc; font-family: sans-serif; padding: 40px; }
+    .container { max-width: 1000px; margin: 0 auto; background: #1e222d; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    h1 { color: #fff; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-bottom: 20px;}
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #2a2e39; }
+    th { background: #2a2e39; color: #fff; }
+    .btn-toggle { padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
+    .btn-activo { background-color: #10b981; } /* Verde */
+    .btn-inactivo { background-color: #ef5350; } /* Rojo */
+    .btn-toggle:hover { opacity: 0.8; }
+    .status-text { font-weight: bold; }
+    .status-activo { color: #10b981; }
+    .status-inactivo { color: #ef5350; }
+    #loader { display: none; color: #3b82f6; font-weight: bold; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>👥 Panel de Usuarios</h1>
+    <p>Administra el acceso a las cuentas de tus suscriptores.</p>
+    <div id="loader">Cargando usuarios...</div>
+    
+    <table id="tabla-usuarios">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Correo</th>
+          <th>Fecha Registro</th>
+          <th>Estado</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Se llena con JavaScript -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // ⚠️ CAMBIA ESTO POR TU DOMINIO REAL
+    const API_URL = "https://api.tradingvenezuela.com/api";
+
+    async function cargarUsuarios() {
+      const loader = document.getElementById('loader');
+      const tbody = document.querySelector('#tabla-usuarios tbody');
+      
+      loader.style.display = 'block';
+      tbody.innerHTML = '';
+
+      try {
+        const res = await fetch(`${API_URL}/admin/usuarios`);
+        const usuarios = await res.json();
+
+        usuarios.forEach(user => {
+          // Formatear fecha
+          const fecha = new Date(user.fecha_registro).toLocaleDateString('es-VE');
+          
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${user.id}</td>
+            <td><strong>${user.nombre_usuario}</strong></td>
+            <td>${user.correo_real}</td>
+            <td>${fecha}</td>
+            <td class="status-text ${user.activo ? 'status-activo' : 'status-inactivo'}">
+              ${user.activo ? 'ACTIVO' : 'INACTIVO'}
+            </td>
+            <td>
+              <button class="btn-toggle ${user.activo ? 'btn-activo' : 'btn-inactivo'}" 
+                      onclick="cambiarEstado(${user.id}, ${!user.activo}, this)">
+                ${user.activo ? 'Desactivar' : 'Activar'}
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        alert("Error cargando usuarios: " + error.message);
+      } finally {
+        loader.style.display = 'none';
+      }
+    }
+
+    async function cambiarEstado(id, nuevoEstado, boton) {
+      boton.disabled = true;
+      boton.textContent = '...';
+
+      try {
+        const res = await fetch(`${API_URL}/admin/toggle-activo/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ activo: nuevoEstado })
+        });
+
+        if (res.ok) {
+          // Recargamos la tabla para ver el cambio reflejado
+          cargarUsuarios();
+        } else {
+          alert("Error al cambiar el estado");
+          boton.disabled = false;
+        }
+      } catch (error) {
+        alert("Error de conexión: " + error.message);
+        boton.disabled = false;
+      }
+    }
+
+    // Cargar al abrir la página
+    cargarUsuarios();
+  </script>
+</body>
+</html>
