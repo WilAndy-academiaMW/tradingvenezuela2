@@ -61,7 +61,7 @@ def estandarizar_fechas_y_convertir(ruta_excel, ruta_csv):
 if __name__ == "__main__":
     # --- CONFIGURACIÓN DE RUTAS ---
     # Usamos la 'r' antes de la comilla para que Windows lea bien las barras invertidas (\)
-    archivo_entrada = r'C:\Users\roble\Desktop\bolsa\BVCC.csv'  
-    archivo_salida = r'C:/Users/roble/Desktop/bolsa/static/csv/acciones/BVC.csv'
+    archivo_entrada = r'C:\Users\roble\Desktop\bolsa\FNC.csv'  
+    archivo_salida = r'C:/Users/roble/Desktop/bolsa/static/csv/acciones/FNC.csv'
     
     estandarizar_fechas_y_convertir(archivo_entrada, archivo_salida)

@@ -32,7 +32,7 @@ def ajustar_bache_historico(ruta_archivo, fecha_limite_corte, factor_ajuste):
 
 
 if __name__ == "__main__":
-    archivo_objetivo = r'C:\Users\roble\Desktop\bolsa\static\csv\acciones\BCVV.csv'
+    archivo_objetivo = r'C:\Users\roble\Desktop\bolsa\static\csv\acciones\FNC.csv'
 
     # Split entre el 2021-09-29 (último día viejo) y el 2021-10-04 (primer día nuevo)
     FECHA_CORTE = '2021-09-29'

@@ -288,6 +288,14 @@ async function cargarGrafica() {
             }
         }
 
+        // 👇 AQUÍ ESTÁ LA MAGIA PARA EL PROBLEMA DE LA ESCALA EN EUR 👇
+        // Forzamos a que la escala de precios se auto-ajuste a los nuevos datos
+        if (window.chart) {
+            window.chart.priceScale('right').applyOptions({
+                autoScale: true,
+            });
+        }
+
         console.log(`✅ [Streaming] Carga completada. Total: ${window.velasCargadas} velas.`);
         window.cargandoVelas = false;
 
