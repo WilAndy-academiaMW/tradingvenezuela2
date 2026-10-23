@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 'actualizarMapaOrdenes',
                 'actualizarResumenTarjetas',
                 'actualizarLibroOrdenes',    
-                
+                'actualizarVolumen', 
             ];
 
             funciones.forEach(fn => {
@@ -147,7 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
         'actualizarRadar',
         'actualizarTerminal',
         'actualizarHistogramas',
-        'actualizarLibroOrdenes'
+        'actualizarLibroOrdenes',
+        'actualizarVolumen', 
     ];
 
     funciones.forEach(fn => {

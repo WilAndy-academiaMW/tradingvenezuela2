@@ -10,8 +10,10 @@ def ajustar_bache_historico(ruta_archivo, fecha_limite_corte, factor_ajuste):
     df['Fecha_dt'] = pd.to_datetime(df['Fecha'], errors='coerce')
     corte = pd.to_datetime(fecha_limite_corte)
 
+    # Aplicar estrictamente a las fechas ANTERIORES o IGUALES a la fecha de corte
     mascara_ajustar = df['Fecha_dt'] <= corte
 
+    # En BPV el ajuste multiplica el precio por 100
     cols_a_modificar = ['Apert.', 'Cierre', 'Max.', 'Min.', 'Abs.']
 
     for col in cols_a_modificar:
@@ -19,7 +21,9 @@ def ajustar_bache_historico(ruta_archivo, fecha_limite_corte, factor_ajuste):
             if df[col].dtype == object:
                 df[col] = df[col].astype(str).str.replace('.', '', regex=False).str.replace(',', '.', regex=False)
             df[col] = pd.to_numeric(df[col], errors='coerce')
-            df.loc[mascara_ajustar, col] = df.loc[mascara_ajustar, col] / factor_ajuste
+            
+            # MULTIPLICAMOS por 100
+            df.loc[mascara_ajustar, col] = df.loc[mascara_ajustar, col] * factor_ajuste
 
     df.drop(columns=['Fecha_dt'], inplace=True)
 
@@ -32,10 +36,12 @@ def ajustar_bache_historico(ruta_archivo, fecha_limite_corte, factor_ajuste):
 
 
 if __name__ == "__main__":
-    archivo_objetivo = r'C:\Users\roble\Desktop\bolsa\static\csv\acciones\BVCC.csv'
+    archivo_objetivo = r'C:\Users\roble\Desktop\bolsa\static\csv\acciones\BPV.csv'
 
-    # Ajuste entre el 2021-05-11 (último día viejo) y el 2021-05-17 (primer día nuevo)
-    FECHA_CORTE = '2021-05-11'
-    FACTOR = 0.684021 / 0.415013   # ≈ 1.6482
+    # El 16-Oct es el último día de la escala vieja.
+    FECHA_CORTE = '2026-10-16'
+    
+    # Pasó de 99.0 a 9900.0, por lo que el factor es 100.
+    FACTOR = 100.0
 
     ajustar_bache_historico(archivo_objetivo, FECHA_CORTE, FACTOR)

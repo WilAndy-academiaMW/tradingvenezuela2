@@ -205,9 +205,47 @@
                 <div id="info-capitali" style="color: #93c5fd; font-size: 12px; font-weight: bold; line-height: 1.4;">--</div>
             </div>
         </div>
+        
 
     </div>
 </section>
+
+<!-- ========================================== -->
+<!-- GRÁFICA DE VOLUMEN HISTÓRICO -->
+<!-- ========================================== -->
+<div style="max-width: 1200px; margin: 24px auto; padding: 0 16px; position: relative; z-index: 1;">
+    <div style="background: #0a0a1a; padding: 16px; border-radius: 16px; border: 1px solid #1a1a3e;">
+        
+        <!-- Header y Controles -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <span style="color: #60a5fa; font-size: 13px; font-weight: bold; font-family: 'Courier New', monospace; letter-spacing: 1px;">
+                📊 VOLUMEN HISTÓRICO
+            </span>
+            
+            <div style="display: flex; gap: 10px;">
+                <!-- Selector de Divisa -->
+                <div style="display: flex; background: #1a1a3e; border-radius: 6px; overflow: hidden; border: 1px solid #2a2a5e;">
+                    <button id="btn-divisa-bs" class="btn-toggle active" style="background: #2563eb; color: white; border: none; padding: 6px 12px; font-size: 11px; cursor: pointer; font-family: 'Courier New', monospace;">Bs.</button>
+                    <button id="btn-divisa-usd" class="btn-toggle" style="background: transparent; color: #9ca3af; border: none; padding: 6px 12px; font-size: 11px; cursor: pointer; font-family: 'Courier New', monospace;">USD</button>
+                </div>
+
+                <!-- Selector de Modo -->
+                <div style="display: flex; background: #1a1a3e; border-radius: 6px; overflow: hidden; border: 1px solid #2a2a5e;">
+                    <button id="btn-modo-total" class="btn-toggle active" style="background: #2563eb; color: white; border: none; padding: 6px 12px; font-size: 11px; cursor: pointer; font-family: 'Courier New', monospace;">TOTAL</button>
+                    <button id="btn-modo-oc" class="btn-toggle" style="background: transparent; color: #9ca3af; border: none; padding: 6px 12px; font-size: 11px; cursor: pointer; font-family: 'Courier New', monospace;">O / C</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor de la Gráfica (CON ALTURA FIJA Y RELATIVA) -->
+        <div style="height: 350px; width: 100%; position: relative;">
+            <canvas id="volumenChart"></canvas>
+        </div>
+
+    </div>
+</div>
+<!-- ========================================== -->
+
 <!-- ========================================== -->
 <!--libro de orednes-->
 <!-- ========================================== -->
@@ -355,7 +393,7 @@
 <script src="../static/js/acciones/book.js"></script>
 <script src="../static/js/acciones/CVD.js"></script>
 <script src="../static/js/acciones/resumen.js"></script>
-
+<script src="../static/js/acciones/volumen.js"></script>
 <script src="../static/js/acciones/vela.js"></script>
 <script src="../static/js/acciones/delta_book.js"></script>
  <!--
