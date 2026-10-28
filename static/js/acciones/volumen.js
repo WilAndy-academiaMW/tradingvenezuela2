@@ -68,7 +68,6 @@
             const json = await res.json();
             datosGlobales = json.volumen || [];
             
-            // Si no hay datos, no dibujar
             if (datosGlobales.length === 0) {
                 if (chartInstance) chartInstance.destroy();
                 return;
@@ -86,7 +85,6 @@
         if (!canvas || datosGlobales.length === 0) return;
         const ctx = canvas.getContext('2d');
 
-        // Destruir gráfica anterior si existe
         if (chartInstance) {
             chartInstance.destroy();
         }
@@ -95,6 +93,11 @@
         
         let datasets = [];
         let titleText = "";
+        
+        // Variables para calcular los promedios
+        let promTotal = 0;
+        let promO = 0;
+        let promC = 0;
 
         if (modoActual === "total") {
             // MODO TOTAL
@@ -106,15 +109,20 @@
                 dataTotal = datosGlobales.map(d => d.usd_total);
                 titleText = "Volumen Total (USD)";
             }
+            
+            const valoresValidos = dataTotal.filter(v => v !== null && v !== undefined);
+            if (valoresValidos.length > 0) {
+                promTotal = valoresValidos.reduce((a, b) => a + b, 0) / valoresValidos.length;
+            }
 
             datasets.push({
                 label: 'Volumen Total',
                 data: dataTotal,
                 type: 'bar',
-                backgroundColor: 'rgba(96, 165, 250, 0.7)', // Azul semitransparente
+                backgroundColor: 'rgba(96, 165, 250, 0.7)', 
                 borderColor: '#60a5fa',
                 borderWidth: 1,
-                borderRadius: 4 // Bordes redondeados
+                borderRadius: 4 
             });
 
         } else {
@@ -131,12 +139,20 @@
                 dataC = datosGlobales.map(d => d.usd_C > 0 ? d.usd_C : null);
                 titleText = "Volumen O / C (USD) - Escala Log";
             }
+            
+            // Calcular promedio de O
+            const valO = dataO.filter(v => v !== null && v !== undefined);
+            if (valO.length > 0) promO = valO.reduce((a, b) => a + b, 0) / valO.length;
+            
+            // Calcular promedio de C
+            const valC = dataC.filter(v => v !== null && v !== undefined);
+            if (valC.length > 0) promC = valC.reduce((a, b) => a + b, 0) / valC.length;
 
             datasets.push({
                 label: 'Operaciones (O)',
                 data: dataO,
                 type: 'bar',
-                backgroundColor: 'rgba(0, 255, 136, 0.7)', // Verde semitransparente
+                backgroundColor: 'rgba(0, 255, 136, 0.7)', 
                 borderColor: '#00ff88',
                 borderWidth: 1,
                 borderRadius: 4
@@ -145,12 +161,76 @@
                 label: 'Cierre (C)',
                 data: dataC,
                 type: 'bar',
-                backgroundColor: 'rgba(255, 170, 0, 0.7)', // Naranja semitransparente
+                backgroundColor: 'rgba(255, 170, 0, 0.7)', 
                 borderColor: '#ffaa00',
                 borderWidth: 1,
                 borderRadius: 4
             });
         }
+
+        // Imprimir en consola
+        if (modoActual === 'total') {
+            console.log(`📊 Promedio Total (${divisaActual}):`, promTotal);
+        } else {
+            console.log(`📊 Promedio O (${divisaActual}):`, promO);
+            console.log(`📊 Promedio C (${divisaActual}):`, promC);
+        }
+
+        // 🔥 PLUGIN PARA DIBUJAR LAS LÍNEAS DEL PROMEDIO
+        const promedioPlugin = {
+            id: 'promedioLine',
+            afterDraw: (chart) => {
+                const { ctx, chartArea: { top, bottom, left, right }, scales: { y } } = chart;
+                
+                // Función auxiliar para no repetir código al dibujar las líneas
+                const dibujarLinea = (valor, color, etiqueta) => {
+                    if (valor <= 0) return;
+                    const yPos = y.getPixelForValue(valor);
+                    if (yPos < top || yPos > bottom) return;
+
+                    ctx.save();
+                    
+                    // Línea
+                    ctx.beginPath();
+                    ctx.moveTo(left, yPos);
+                    ctx.lineTo(right, yPos);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = color; 
+                    ctx.setLineDash([5, 5]); 
+                    ctx.stroke();
+
+                    // Etiqueta
+                    const prefijo = divisaActual === 'bs' ? 'Bs. ' : '$ ';
+                    const texto = `${etiqueta}: ${prefijo}${valor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    
+                    ctx.font = 'bold 11px "Courier New", monospace';
+                    const textWidth = ctx.measureText(texto).width;
+                    
+                    ctx.fillStyle = 'rgba(10, 10, 26, 0.9)';
+                    ctx.fillRect(right - textWidth - 16, yPos - 18, textWidth + 10, 16);
+                    
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([]); 
+                    ctx.strokeRect(right - textWidth - 16, yPos - 18, textWidth + 10, 16);
+                    
+                    ctx.fillStyle = color;
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(texto, right - 10, yPos - 10);
+                    
+                    ctx.restore();
+                };
+
+                // Dibujamos según el modo
+                if (modoActual === 'total') {
+                    dibujarLinea(promTotal, '#ffd700', 'Prom'); // Dorado
+                } else {
+                    dibujarLinea(promO, '#00ff88', 'Prom O'); // Verde
+                    dibujarLinea(promC, '#ffaa00', 'Prom C'); // Naranja
+                }
+            }
+        };
 
         // Crear la gráfica
         chartInstance = new Chart(ctx, {
@@ -204,7 +284,7 @@
                 },
                 scales: {
                     x: {
-                        grid: { display: false }, // Ocultamos las líneas verticales para que se vea más limpio
+                        grid: { display: false }, 
                         ticks: { 
                             color: '#6b7280', 
                             font: { family: "'Courier New', monospace", size: 10 },
@@ -222,11 +302,12 @@
                         }
                     }
                 }
-            }
+            },
+            plugins: [promedioPlugin]
         });
     }
 
-    // Exponer la función global para que app.js la llame al cambiar de botón
+    // Exponer la función global
     window.actualizarVolumen = function(simbolo) {
         cargarDatos(simbolo);
     };
