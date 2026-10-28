@@ -72,7 +72,7 @@ window.chart = LightweightCharts.createChart(chartElement, {
         timeVisible: true,
         borderColor: '#485c7b',
         barSpacing: 10,
-        rightOffset: 20,
+        rightOffset: 200,
         minBarSpacing: 0.5,
         fixLeftEdge: false,
         shiftVisibleRangeOnNewBar: true,
@@ -197,89 +197,48 @@ async function cargarGrafica() {
     const divisaEndpoint = (window.monedaVisual === 'EUR') ? 'euro' : 'ves';
     const API_BASE = window.API_BASE || 'https://api.tradingvenezuela.com';
 
-    console.log(`⚡ [Streaming] Iniciando carga por lotes para ${window.monedaActual} (${tf})...`);
-    
+    // 👇 LÍMITE: 500 velas (diaria, semanal y mensual) 👇
+    const LIMITE_TOTAL = 500;
+
+    console.log(`⚡ [Streaming] Cargando ${LIMITE_TOTAL} velas de ${window.monedaActual} (${tf})...`);
+
     window.cargandoVelas = true;
     window.seriesData = [];
     window.velasCargadas = 0;
-
-    // Limpiamos la gráfica antes de empezar
     window.candlestickSeries.setData([]);
 
-    // Configuración del lote
-    const LOTE = 100; // Traer de 100 en 100
-    const LIMITE_TOTAL = window.maxVelasPorBloque || 500; // Total a cargar inicialmente
-    let offset = 0;
-    let primeraCarga = true;
-
     try {
-        while (offset < LIMITE_TOTAL) {
-            // Verificamos que el usuario no haya cambiado de moneda mientras cargaba
-            const simboloActual = window.monedaActual.replace('/', '_').replace('.', '_');
-            if (simboloActual !== simboloArchivo) {
-                console.log("🛑 El usuario cambió de moneda. Deteniendo carga.");
-                break;
-            }
+        // Una sola petición con el límite completo
+        const url = `${API_BASE}/api/acciones/${temporalidadEndpoint}/${divisaEndpoint}/${simboloArchivo}?limit=${LIMITE_TOTAL}&offset=0`;
+        const response = await fetch(url);
+        const data = await response.json();
+        const filas = (data && data.datos) ? data.datos : [];
 
-            const url = `${API_BASE}/api/acciones/${temporalidadEndpoint}/${divisaEndpoint}/${simboloArchivo}?limit=${LOTE}&offset=${offset}`;
-            
-            // Hacemos la petición (await detiene el bucle hasta que llegue este lote)
-            const response = await fetch(url);
-            const data = await response.json();
-            const filas = (data && data.datos) ? data.datos : [];
-
-            if (!filas.length) {
-                // No hay más datos en el servidor
-                break;
-            }
-
-            const nuevasVelas = formatearDatos(filas, tf);
-            
-            if (nuevasVelas.length > 0) {
-                // 👇 MEZCLAMOS LOS DATOS NUEVOS CON LOS QUE YA TENÍAMOS 👇
-                // Importante: el formatearDatos los ordena de viejo a nuevo.
-                // Como el offset trae los más nuevos primero, debemos insertarlos al principio.
-                window.seriesData = [...nuevasVelas, ...window.seriesData];
-                
-                // Eliminar duplicados (por si el offset se solapa)
-                const dataUnica = [];
-                const fechasVistas = new Set();
-                window.seriesData.forEach(vela => {
-                    if (!fechasVistas.has(vela.time)) {
-                        dataUnica.push(vela);
-                        fechasVistas.add(vela.time);
-                    }
-                });
-                window.seriesData = dataUnica;
-                window.velasCargadas = dataUnica.length;
-
-                // 👇 DIBUJAMOS INMEDIATAMENTE 👇
-                window.candlestickSeries.setData(window.seriesData);
-
-                // Si es la primera carga, hacemos zoom a las últimas 100 velas
-                if (primeraCarga && window.seriesData.length > 0) {
-                    const total = window.seriesData.length;
-                    const velasAMostrar = Math.min(100, total);
-                    window.chart.timeScale().setVisibleLogicalRange({
-                        from: total - velasAMostrar,
-                        to: total
-                    });
-                    primeraCarga = false;
-                }
-
-                console.log(`📦 Lote de ${nuevasVelas.length} velas dibujado. Total en gráfico: ${window.velasCargadas}`);
-            }
-
-            // Actualizamos el offset para la siguiente petición
-            offset += LOTE;
-            
-            // Pequeña pausa opcional para no saturar el navegador (10ms)
-            await new Promise(r => setTimeout(r, 10)); 
+        if (!filas.length) {
+            console.log("📭 Sin datos para mostrar.");
+            window.cargandoVelas = false;
+            return;
         }
 
-        // Al final, actualizamos el precio superior con el último dato
-        if (window.seriesData.length > 0) {
-            const ultimoDato = window.seriesData[window.seriesData.length - 1];
+        const velas = formatearDatos(filas, tf);
+        window.seriesData = velas;
+        window.velasCargadas = velas.length;
+
+        window.candlestickSeries.setData(velas);
+
+        // Zoom a las últimas 100 velas
+        if (velas.length > 0) {
+            const total = velas.length;
+            const velasAMostrar = Math.min(100, total);
+            window.chart.timeScale().setVisibleLogicalRange({
+                from: total - velasAMostrar,
+                to: total
+            });
+        }
+
+        // Precio superior
+        if (velas.length > 0) {
+            const ultimoDato = velas[velas.length - 1];
             const precioDisplay = document.getElementById('price-display');
             if (precioDisplay) {
                 const simboloPrecio = (window.monedaVisual === 'EUR') ? '€' : 'Bs';
@@ -288,19 +247,16 @@ async function cargarGrafica() {
             }
         }
 
-        // 👇 AQUÍ ESTÁ LA MAGIA PARA EL PROBLEMA DE LA ESCALA EN EUR 👇
-        // Forzamos a que la escala de precios se auto-ajuste a los nuevos datos
+        // Forzar autoscale (problema EUR)
         if (window.chart) {
-            window.chart.priceScale('right').applyOptions({
-                autoScale: true,
-            });
+            window.chart.priceScale('right').applyOptions({ autoScale: true });
         }
 
         console.log(`✅ [Streaming] Carga completada. Total: ${window.velasCargadas} velas.`);
         window.cargandoVelas = false;
 
     } catch (error) {
-        console.error("❌ Error en carga por lotes:", error);
+        console.error("❌ Error en carga:", error);
         window.cargandoVelas = false;
     }
 }
