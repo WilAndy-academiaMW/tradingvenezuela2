@@ -1,5 +1,5 @@
 // ============================================================================
-// volumen.js - Gráfica Histórica de Volumen (Barras)
+// volumen.js - Gráfica Histórica de Volumen (Barras) - PROMEDIOS FUERA
 // ============================================================================
 
 (function() {
@@ -140,11 +140,9 @@
                 titleText = "Volumen O / C (USD) - Escala Log";
             }
             
-            // Calcular promedio de O
             const valO = dataO.filter(v => v !== null && v !== undefined);
             if (valO.length > 0) promO = valO.reduce((a, b) => a + b, 0) / valO.length;
             
-            // Calcular promedio de C
             const valC = dataC.filter(v => v !== null && v !== undefined);
             if (valC.length > 0) promC = valC.reduce((a, b) => a + b, 0) / valC.length;
 
@@ -168,67 +166,60 @@
             });
         }
 
-        // Imprimir en consola
-        if (modoActual === 'total') {
-            console.log(`📊 Promedio Total (${divisaActual}):`, promTotal);
-        } else {
-            console.log(`📊 Promedio O (${divisaActual}):`, promO);
-            console.log(`📊 Promedio C (${divisaActual}):`, promC);
-        }
-
-        // 🔥 PLUGIN PARA DIBUJAR LAS LÍNEAS DEL PROMEDIO
+        // 🔥 PLUGIN PARA DIBUJAR LAS LÍNEAS DEL PROMEDIO Y TEXTOS ARRIBA 🔥
         const promedioPlugin = {
             id: 'promedioLine',
             afterDraw: (chart) => {
                 const { ctx, chartArea: { top, bottom, left, right }, scales: { y } } = chart;
                 
-                // Función auxiliar para no repetir código al dibujar las líneas
-                const dibujarLinea = (valor, color, etiqueta) => {
+                const dibujarLinea = (valor, color) => {
                     if (valor <= 0) return;
                     const yPos = y.getPixelForValue(valor);
                     if (yPos < top || yPos > bottom) return;
 
                     ctx.save();
                     
-                    // Línea
+                    // Línea punteada
                     ctx.beginPath();
                     ctx.moveTo(left, yPos);
                     ctx.lineTo(right, yPos);
-                    ctx.lineWidth = 2;
+                    ctx.lineWidth = 1.5;
                     ctx.strokeStyle = color; 
                     ctx.setLineDash([5, 5]); 
                     ctx.stroke();
-
-                    // Etiqueta
-                    const prefijo = divisaActual === 'bs' ? 'Bs. ' : '$ ';
-                    const texto = `${etiqueta}: ${prefijo}${valor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                    
-                    ctx.font = 'bold 11px "Courier New", monospace';
-                    const textWidth = ctx.measureText(texto).width;
-                    
-                    ctx.fillStyle = 'rgba(10, 10, 26, 0.9)';
-                    ctx.fillRect(right - textWidth - 16, yPos - 18, textWidth + 10, 16);
-                    
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = 1;
-                    ctx.setLineDash([]); 
-                    ctx.strokeRect(right - textWidth - 16, yPos - 18, textWidth + 10, 16);
-                    
-                    ctx.fillStyle = color;
-                    ctx.textAlign = 'right';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(texto, right - 10, yPos - 10);
-                    
                     ctx.restore();
                 };
 
-                // Dibujamos según el modo
+                // Textos fuera de la gráfica (en el margen superior)
+                const prefijo = divisaActual === 'bs' ? 'Bs. ' : '$ ';
+                ctx.save();
+                ctx.font = 'bold 11px "Courier New", monospace';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'bottom';
+
+                // Ajustamos la posición Y para que queden por encima del gráfico (top - 10)
+                const yTextPos = top - 5; 
+                
                 if (modoActual === 'total') {
-                    dibujarLinea(promTotal, '#ffd700', 'Prom'); // Dorado
+                    dibujarLinea(promTotal, '#ffd700');
+                    const texto = `Prom: ${prefijo}${promTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fillText(texto, right, yTextPos);
                 } else {
-                    dibujarLinea(promO, '#00ff88', 'Prom O'); // Verde
-                    dibujarLinea(promC, '#ffaa00', 'Prom C'); // Naranja
+                    dibujarLinea(promO, '#00ff88');
+                    dibujarLinea(promC, '#ffaa00');
+                    
+                    const textoO = `Prom O: ${prefijo}${promO.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    const textoC = `Prom C: ${prefijo}${promC.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    
+                    // Los dibujamos uno al lado del otro
+                    ctx.fillStyle = '#00ff88';
+                    ctx.fillText(textoO, right - 200, yTextPos); 
+                    
+                    ctx.fillStyle = '#ffaa00';
+                    ctx.fillText(textoC, right, yTextPos);
                 }
+                ctx.restore();
             }
         };
 
@@ -242,8 +233,13 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 15 // 👈 Damos un poco de margen arriba para que los textos respiren
+                    }
+                },
                 interaction: {
-                    mode: 'index',
+                    mode: 'index', // 👈 Volvemos al modo cruzado
                     intersect: false,
                 },
                 plugins: {
