@@ -9,6 +9,13 @@
     .container { background: #1e222d; padding: 30px; border-radius: 10px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     h2 { text-align: center; margin-bottom: 20px; color: #fff; }
     input { width: 100%; padding: 10px; margin-bottom: 15px; background: #2a2e39; border: 1px solid #485c7b; color: white; border-radius: 5px; box-sizing: border-box; }
+    
+    /* Estilos para el contenedor del input de contraseña y su botón */
+    .password-container { position: relative; margin-bottom: 15px; }
+    .password-container input { margin-bottom: 0; padding-right: 50px; }
+    .toggle-pass { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 13px; padding: 4px 8px; width: auto; font-weight: normal; margin: 0; }
+    .toggle-pass:hover { color: #fff; background: none; }
+
     button { width: 100%; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
     button:hover { background: #2563eb; }
     .toggle-link { text-align: center; display: block; color: #3b82f6; cursor: pointer; font-size: 14px; margin-top: 10px; text-decoration: none; }
@@ -24,7 +31,12 @@
 
     <form id="auth-form" novalidate> 
       <input type="text" id="usuario" placeholder="Usuario" required>
-      <input type="password" id="password" placeholder="Contraseña" required>
+      
+      <!-- Contenedor para la contraseña y el botón de mostrar/ocultar -->
+      <div class="password-container">
+        <input type="password" id="password" placeholder="Contraseña" required>
+        <button type="button" id="btn-toggle-pass" class="toggle-pass">Mostrar</button>
+      </div>
       
       <!-- Solo se muestra al registrarse -->
       <input type="email" id="email-recuperacion" placeholder="Correo real (para recuperar clave)" class="hidden">
@@ -37,7 +49,7 @@
 
   <script>
     // ⚠️ URL DE TU API
-    const API_URL =  "https://api.tradingvenezuela.com/api";
+    const API_URL = "https://api.tradingvenezuela.com/api";
 
     let isRegisterMode = false;
     const form = document.getElementById('auth-form');
@@ -46,12 +58,27 @@
     const btnToggle = document.getElementById('btn-toggle-mode');
     const inputEmailRecuperacion = document.getElementById('email-recuperacion');
     const errorMsg = document.getElementById('error-msg');
+    const passwordInput = document.getElementById('password');
+    const btnTogglePass = document.getElementById('btn-toggle-pass');
+
+    // Lógica para mostrar y ocultar la contraseña
+    btnTogglePass.addEventListener('click', () => {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        btnTogglePass.textContent = 'Ocultar';
+      } else {
+        passwordInput.type = 'password';
+        btnTogglePass.textContent = 'Mostrar';
+      }
+    });
 
     btnToggle.addEventListener('click', (e) => {
       e.preventDefault();
       isRegisterMode = !isRegisterMode;
       errorMsg.textContent = '';
       form.reset();
+      passwordInput.type = 'password'; // Asegurar que se oculte al cambiar de modo
+      btnTogglePass.textContent = 'Mostrar';
       
       if (isRegisterMode) {
         title.textContent = "Crear Cuenta";
@@ -72,7 +99,7 @@
       btnSubmit.disabled = true;
       
       const usuario = document.getElementById('usuario').value.trim();
-      const password = document.getElementById('password').value;
+      const password = passwordInput.value;
       const emailRec = inputEmailRecuperacion.value.trim();
 
       try {
