@@ -19,6 +19,11 @@ window.velasCargadas = 0;
 window.cargandoVelas = false;
 window.maxVelasPorBloque = 500;
 
+// 👇 NUEVAS: Tipo de gráfico
+window.tipoGraficoActual = window.tipoGraficoActual || 'candles';
+window.lineSeriesChart = null;
+window.barSeriesChart = null;
+
 const chartElement = document.getElementById('chart');
 
 // ==========================================
@@ -68,15 +73,18 @@ window.chart = LightweightCharts.createChart(chartElement, {
     },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
     timeScale: {
-        visible: true,
-        timeVisible: true,
-        borderColor: '#485c7b',
-        barSpacing: 10,
-        rightOffset: 200,
-        minBarSpacing: 0.5,
-        fixLeftEdge: false,
-        shiftVisibleRangeOnNewBar: true,
-    },
+    visible: true,
+    timeVisible: true,
+    borderColor: '#485c7b',
+    barSpacing: 10,
+    rightOffset: 5000, // 👈 Suficiente espacio visual
+    minBarSpacing: 0.1, // Permite hacer mucho zoom out
+    fixLeftEdge: false,
+    fixRightEdge: false, // 👈 CRUCIAL: Permite scrollear más allá de la última vela
+    shiftVisibleRangeOnNewBar: true,
+}
+    
+    ,
     rightPriceScale: {
         borderColor: '#485c7b',
         visible: true,
@@ -111,6 +119,101 @@ window.candlestickSeries = window.chart.addCandlestickSeries({
     priceScaleId: 'right',
 });
 window.lineSeries = window.candlestickSeries;
+
+// ==========================================
+// 4.1 FUNCIÓN AUXILIAR: Asegurar serie del tipo activo
+// ==========================================
+function asegurarSerieTipo(tipo) {
+    if (tipo === 'line' && !window.lineSeriesChart) {
+        window.lineSeriesChart = window.chart.addLineSeries({
+            color: '#3b82f6',
+            lineWidth: 2,
+            priceScaleId: 'right',
+            crosshairMarkerVisible: true,
+            crosshairMarkerRadius: 4,
+            lastValueVisible: true,
+            priceLineVisible: true,
+            visible: false,
+        });
+    }
+    if (tipo === 'bars' && !window.barSeriesChart) {
+        window.barSeriesChart = window.chart.addBarSeries({
+            upColor: '#26a69a',
+            downColor: '#ef5350',
+            thinBars: false,
+            priceScaleId: 'right',
+            visible: false,
+        });
+    }
+}
+
+// ==========================================
+// 4.2 FUNCIÓN AUXILIAR: Renderizar datos según tipo
+// ==========================================
+function renderizarSegunTipo(datos) {
+    if (!datos || !datos.length) return;
+
+    asegurarSerieTipo(window.tipoGraficoActual);
+
+    // Ocultar todas las series
+    if (window.candlestickSeries) window.candlestickSeries.applyOptions({ visible: false });
+    if (window.lineSeriesChart)   window.lineSeriesChart.applyOptions({ visible: false });
+    if (window.barSeriesChart)    window.barSeriesChart.applyOptions({ visible: false });
+
+    // Mostrar y pintar según tipo
+    if (window.tipoGraficoActual === 'candles') {
+        window.candlestickSeries.applyOptions({ visible: true });
+        window.candlestickSeries.setData(datos);
+    } 
+    else if (window.tipoGraficoActual === 'line') {
+        window.lineSeriesChart.applyOptions({ visible: true });
+        window.lineSeriesChart.setData(datos.map(v => ({ time: v.time, value: v.close })));
+    } 
+    else if (window.tipoGraficoActual === 'bars') {
+        window.barSeriesChart.applyOptions({ visible: true });
+        window.barSeriesChart.setData(datos.map(v => ({
+            time: v.time,
+            open: v.open,
+            high: v.high,
+            low: v.low,
+            close: v.close,
+        })));
+    }
+
+    if (window.chart) {
+        window.chart.priceScale('right').applyOptions({ autoScale: true });
+    }
+}
+
+// ==========================================
+// 4.3 FUNCIÓN: Cambiar tipo de gráfico
+// ==========================================
+function cambiarTipoGrafico(tipo, elemento) {
+    if (window.tipoGraficoActual === tipo) return;
+    window.tipoGraficoActual = tipo;
+
+    const label = document.getElementById('chart-type-label');
+    if (label) {
+        label.innerText = tipo === 'candles' ? 'VELAS' : (tipo === 'line' ? 'LÍNEAS' : 'BARRAS');
+    }
+
+    document.querySelectorAll('.chart-type-item').forEach(el => el.classList.remove('active'));
+    if (elemento) elemento.classList.add('active');
+
+    renderizarSegunTipo(window.seriesData);
+
+    requestAnimationFrame(() => {
+        window.trendLines?.forEach(l => l?.actualizar?.());
+        window.horizontalLines?.forEach(l => l?.actualizar?.());
+        window.rectangles?.forEach(r => r?.actualizar?.());
+        window.riesgosGuardados?.forEach(r => r?.actualizar?.());
+    });
+
+    console.log(`📊 Tipo de gráfico cambiado a: ${tipo}`);
+}
+
+// Exponer globalmente (por si el HTML llama onclick)
+window.cambiarTipoGrafico = cambiarTipoGrafico;
 
 // ==========================================
 // FUNCIÓN AUXILIAR PARA FORMATEAR DATOS (BLINDADA)
@@ -184,7 +287,6 @@ function formatearDatos(filas, tf) {
 // ==========================================
 // 5. CARGA INICIAL DE LA GRÁFICA
 // ==========================================
-
 async function cargarGrafica() {
     const tf = window.temporalidadActual;
     const simboloArchivo = window.monedaActual.replace('/', '_').replace('.', '_');
@@ -205,7 +307,11 @@ async function cargarGrafica() {
     window.cargandoVelas = true;
     window.seriesData = [];
     window.velasCargadas = 0;
-    window.candlestickSeries.setData([]);
+
+    // Limpiar series según tipo activo
+    if (window.candlestickSeries) window.candlestickSeries.setData([]);
+    if (window.lineSeriesChart)   window.lineSeriesChart.setData([]);
+    if (window.barSeriesChart)    window.barSeriesChart.setData([]);
 
     try {
         // Una sola petición con el límite completo
@@ -224,7 +330,8 @@ async function cargarGrafica() {
         window.seriesData = velas;
         window.velasCargadas = velas.length;
 
-        window.candlestickSeries.setData(velas);
+        // 👇 Renderizar según el tipo de gráfico activo 👇
+        renderizarSegunTipo(velas);
 
         // Zoom a las últimas 100 velas
         if (velas.length > 0) {
@@ -260,6 +367,9 @@ async function cargarGrafica() {
         window.cargandoVelas = false;
     }
 }
+
+// Exponer globalmente
+window.cargarGrafica = cargarGrafica;
 
 // ==========================================
 // 6. SCROLL INFINITO
@@ -317,7 +427,9 @@ window.chart.timeScale().subscribeVisibleLogicalRangeChange(logicalRange => {
                 window.seriesData = dataUnica;
                 window.velasCargadas = dataUnica.length;
 
-                window.candlestickSeries.setData(dataUnica);
+                // 👇 Renderizar según el tipo de gráfico activo 👇
+                renderizarSegunTipo(dataUnica);
+
                 console.log(`✅ Se añadieron velas antiguas. Total: ${dataUnica.length}`);
                 window.cargandoVelas = false;
             })
@@ -331,56 +443,184 @@ window.chart.timeScale().subscribeVisibleLogicalRangeChange(logicalRange => {
 // ==========================================
 // 7. GESTIÓN DE CLICS EN EL GRÁFICO
 // ==========================================
-window.chart.subscribeClick((param) => {
-    if (!param.point || !param.time) return;
-    const price = window.candlestickSeries.coordinateToPrice(param.point.y);
+// ==========================================
+// 7. GESTIÓN DE CLICS EN EL GRÁFICO
+// ==========================================
+
+/**
+ * Obtiene la serie VISIBLE actualmente (la que el usuario ve)
+ * para calcular precios correctamente.
+ */
+function obtenerSerieVisible() {
+    if (window.tipoGraficoActual === 'line' && window.lineSeriesChart) {
+        return window.lineSeriesChart;
+    }
+    if (window.tipoGraficoActual === 'bars' && window.barSeriesChart) {
+        return window.barSeriesChart;
+    }
+    return window.candlestickSeries;
+}
+
+/**
+ * Convierte coordenada Y del clic a precio, usando la serie correcta
+ * y validando que el resultado sea un número coherente.
+ */
+function obtenerPrecioDesdeClic(param) {
+    if (!param || !param.point) return null;
+
+    const serie = obtenerSerieVisible();
+    if (!serie) return null;
+
+    let price = serie.coordinateToPrice(param.point.y);
+
+    // Validación: si no es número o es <= 0, intentar con candlestick
+    if (price === null || isNaN(price) || price <= 0) {
+        price = window.candlestickSeries.coordinateToPrice(param.point.y);
+    }
+
+    // Validación final
+    if (price === null || isNaN(price)) {
+        console.warn('⚠️ No se pudo obtener precio del clic');
+        return null;
+    }
+
+    return price;
+}
+
+/**
+ * Normaliza el tiempo del clic según la temporalidad,
+ * para que coincida SIEMPRE con el formato de seriesData.
+ */
+function normalizarTiempoClic(param) {
+    if (!param || param.time === undefined) return null;
 
     const tf = window.temporalidadActual;
     let time = param.time;
+
     if (tf === '1d' || tf === '1w') {
+        // Formato: 'YYYY-MM-DD'
         if (typeof time !== 'string') {
             time = new Date(time * 1000).toISOString().split('T')[0];
         }
     } else {
+        // Formato: timestamp Unix (segundos)
         if (typeof time === 'string') {
             time = Math.floor(new Date(time).getTime() / 1000);
         }
     }
 
+    return time;
+}
+
+window.chart.subscribeClick((param) => {
+    if (!param || !param.point) return;
+
+    // 👇 Usar las funciones robustas 👇
+    const price = obtenerPrecioDesdeClic(param);
+    const time = normalizarTiempoClic(param);
+
+    if (price === null || time === null) return;
+
+    console.log(`🖱️ Clic en time=${time} price=${price.toFixed(3)}`);
+
+    // ---- LÍNEA DE TENDENCIA ----
     if (window.modoDibujo === 'LINE') {
+        window.puntosPendientes = window.puntosPendientes || [];
         window.puntosPendientes.push({ time, price });
+
         if (window.puntosPendientes.length === 1) {
-            window.lineaTemporal = window.crearLineaDiv(window.puntosPendientes[0], { time, price }, true, '#FFD700');
+            window.lineaTemporal = window.crearLineaDiv(
+                window.puntosPendientes[0],
+                { time, price },
+                true,
+                '#FFD700'
+            );
         } else if (window.puntosPendientes.length === 2) {
             const p1 = window.puntosPendientes[0];
             const p2 = { time, price };
             const nuevaLinea = window.crearLineaDiv(p1, p2, false, '#FFD700');
             window.trendLines.push(nuevaLinea);
+
             if (typeof guardarLineaBD === 'function') {
                 guardarLineaBD(p1, p2, 'trendline', '#FFD700');
             }
             window.desactivarModoDibujo();
+            window.puntosPendientes = [];
         }
         return;
     }
 
+    // ---- RECTÁNGULO ----
     if (window.modoDibujoRectangulo === true) {
+        window.puntosRectangulo = window.puntosRectangulo || [];
         window.puntosRectangulo.push({ time, price });
+
         if (window.puntosRectangulo.length === 1) {
-            window.rectanguloTemporal = window.crearRectanguloDiv(window.puntosRectangulo[0], { time, price }, true);
+            window.rectanguloTemporal = window.crearRectanguloDiv(
+                window.puntosRectangulo[0],
+                { time, price },
+                true
+            );
         } else if (window.puntosRectangulo.length === 2) {
-            const nuevoRect = window.crearRectanguloDiv(window.puntosRectangulo[0], window.puntosRectangulo[1], false);
+            const nuevoRect = window.crearRectanguloDiv(
+                window.puntosRectangulo[0],
+                window.puntosRectangulo[1],
+                false
+            );
+            window.rectangles = window.rectangles || [];
             window.rectangles.push(nuevoRect);
             window.desactivarModoRectangulo();
+            window.puntosRectangulo = [];
         }
         return;
     }
 
+    // ---- LÍNEA HORIZONTAL ----
     if (window.modoDibujoHorizontal === true) {
         if (price !== null) {
             const nuevaLineaH = window.crearLineaHorizontalDiv(price);
+            window.horizontalLines = window.horizontalLines || [];
             window.horizontalLines.push(nuevaLineaH);
             window.desactivarModoHorizontal();
+        }
+        return;
+    }
+
+    // ---- FIBONACCI ----
+    if (window.modoDibujoFibo === true) {
+        window.puntosFibo = window.puntosFibo || [];
+        window.puntosFibo.push({ time, price });
+
+        if (window.puntosFibo.length === 2) {
+            if (typeof window.crearFibo === 'function') {
+                window.crearFibo(window.puntosFibo[0], window.puntosFibo[1]);
+            }
+            window.puntosFibo = [];
+        }
+        return;
+    }
+
+    // ---- REGLA ----
+    if (window.modoDibujoRegla === true) {
+        window.puntosRegla = window.puntosRegla || [];
+        window.puntosRegla.push({ time, price });
+
+        if (window.puntosRegla.length === 2) {
+            if (typeof window.crearRegla === 'function') {
+                window.crearRegla(window.puntosRegla[0], window.puntosRegla[1]);
+            }
+            window.puntosRegla = [];
+        }
+        return;
+    }
+
+    // ---- ELLIOT ----
+    if (window.modoDibujoElliot === true) {
+        window.puntosElliot = window.puntosElliot || [];
+        window.puntosElliot.push({ time, price });
+
+        if (typeof window.agregarPuntoElliot === 'function') {
+            window.agregarPuntoElliot({ time, price });
         }
         return;
     }
@@ -447,6 +687,10 @@ function cambiarTF(tf, elementoSeleccionado) {
     cargarGrafica();
 }
 
+// Exponer globalmente (para onclick del HTML)
+window.cambiarMoneda = cambiarMoneda;
+window.cambiarTF = cambiarTF;
+
 function asegurarDrawingLayer() {
     let layer = document.getElementById('drawing-layer');
     if (!layer) {
@@ -474,6 +718,8 @@ function limpiarTodo() {
     }
 }
 
+window.limpiarTodo = limpiarTodo;
+
 // ==========================================
 // 10. MARCA DE AGUA
 // ==========================================
@@ -498,6 +744,8 @@ function actualizarMarcaDeAgua() {
         <p style="font-size: 32px; font-weight: 600; color: #ffffff; margin: 10px 0 0 0;">${window.temporalidadActual.toUpperCase()}</p>
     `;
 }
+
+window.actualizarMarcaDeAgua = actualizarMarcaDeAgua;
 
 // ==========================================
 // 11. ARRANQUE INICIAL

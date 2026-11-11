@@ -65,6 +65,22 @@
                 <div onclick="toggleLiquidez()" class="dropdown-item"><span>🎯</span> Liquidez</div>
             </div>
         </div>
+        <div class="dropdown">
+    <button type="button" class="dropdown-trigger btn-chart">
+        <span>📊</span> <span id="chart-type-label">VELAS</span> <small class="arrow">▼</small>
+    </button>
+    <div class="dropdown-content">
+        <div onclick="cambiarTipoGrafico('candles', this)" class="dropdown-item chart-type-item active">
+            <span>🕯️</span> Velas Japonesas
+        </div>
+        <div onclick="cambiarTipoGrafico('line', this)" class="dropdown-item chart-type-item">
+            <span>📈</span> Líneas (Cierre)
+        </div>
+        <div onclick="cambiarTipoGrafico('bars', this)" class="dropdown-item chart-type-item">
+            <span>📊</span> Barras (Apert./Cierre)
+        </div>
+    </div>
+</div>
 
         <div class="dropdown">
             <button type="button" class="dropdown-trigger btn-smc">
